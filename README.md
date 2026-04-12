@@ -18,24 +18,7 @@ Please don't commit changes to this file. You can instruct git to ignore these c
 git update-index --skip-worktree Directory.Build.props
 ```
 
-This repository contains 3 projects. Once the solution is built, the following DLLs will be present in the build folder:
+This repository contains 1 project. Once the solution is built, the following DLL will be present in the build folder:
 * `PantheonMetrics.dll`, which goes in the `/mods` directory in your game installation. Note that this dll is automatically put in the `/mods` directory do you do not need to perform any copying yourself.
 
 Depending on where the source code is located, the project may fail to resolve the dependency libraries. You'll need to remove all library references and re-add them at the correct path.
-
-## Disclaimer regarding cheating/anticheat
-We believe that these addons do not violate the terms and conditions of Pantheon: Rise of the Fallen. From the EULA (as of 7th Jan 2025), we may not:
-
-(b) use cheats, exploits, automation software, bots, hacks, mods or any unauthorized third-party software,
-code or other device designed to modify or interfere with the Game or Service, or without Visionary Realms’
-express written consent, modify or cause to be modified any files that are a part of the Game or Service;
-
-This framework does not, and will never:
-
-* Automate gameplay actions such as pressing keys automatically
-  * An exception is made for some actions e.g., allowing key presses to trigger macros
-* Interfere with or change any gameplay
-* Draw anything on the screen outside of changes to the user interface
-* Modify any files, everything is applied at runtime
-
-Use of this mod are to be used at your own risk. We do not accept any liability or responsibility for any actions taken against your account for using these mods.
