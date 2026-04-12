@@ -1,15 +1,19 @@
 ﻿using HarmonyLib;
 using Il2Cpp;
-using System.Linq;
 using Il2CppPantheonPersist;
+using Il2CppTMPro;
 using MelonLoader;
 using PantheonMetrics.Data;
 using PantheonMetrics.Hooks;
 using PantheonMetrics.Logics;
-using System.Reflection;
-using static Il2CppSystem.Xml.XmlTextReaderImpl;
 using PantheonMetrics.Objects;
-using Il2CppTMPro;
+using System.Diagnostics;
+using System.Linq;
+using System.Reflection;
+using Unity.Collections;
+using UnityEngine;
+using UnityEngine.TextCore.Text;
+using static Il2CppSystem.Xml.XmlTextReaderImpl;
 
 namespace PantheonMetrics;
 
@@ -28,6 +32,13 @@ public class PantheonMetricsMain : MelonMod
   {
     MetricsLogging.Log = LoggerInstance;
     MetricsExperience.ResetExperience(0);
+
+
+
+    //Enable and disable Features. SHould be loaded from somewhere and should be overridable from client
+    MetricsConfiguration.BreathWarningEnabled = false;
+    MetricsConfiguration.ExperienceMetricEnabled = true;
+    MetricsConfiguration.CombatTrackingEnabled = true;
   }
 
   public override void OnLateInitializeMelon()
@@ -58,28 +69,35 @@ public class PantheonMetricsMain : MelonMod
     if (__0 is EntityStatusType est)
       status = est;
 
-    if (status == EntityStatusType.HoldingSomethingBurning)
-      return;
-
-
 
 
     WaterManagement.HandleWaterLogic(status, __1);
 
-
-
-
-    List<EntityStatusType> ignoredStatusTypes = new List<EntityStatusType> 
-    { 
-      EntityStatusType.None,
-      EntityStatusType.Swimming,
-      EntityStatusType.Submerged,
-      EntityStatusType.HoldingSomethingBurning
+    List<EntityStatusType> allowedStatusTypes = new List<EntityStatusType>
+    {
+      EntityStatusType.InCombat,
+      EntityStatusType.Dead,
+      EntityStatusType.Pet,
+      EntityStatusType.PetFollowing,
     };
 
-
-    if (ignoredStatusTypes.Contains(status)) 
+    if (!allowedStatusTypes.Contains(status))
       return;
+
+
+
+    //List<EntityStatusType> ignoredStatusTypes = new List<EntityStatusType> 
+    //{ 
+    //  EntityStatusType.None,
+    //  EntityStatusType.Swimming,
+    //  EntityStatusType.Submerged,
+    //  EntityStatusType.HoldingSomethingBurning,
+    //  EntityStatusType.Walking,
+    //};
+
+
+    //if (ignoredStatusTypes.Contains(status)) 
+    //  return;
 
 
 
@@ -102,11 +120,41 @@ public class PantheonMetricsMain : MelonMod
 
 
 
+
+
+
+
     var iEntityType = _il2cppAsm.GetType("Il2Cpp.IEntity")
                ?? _il2cppAsm.GetTypes().FirstOrDefault(t => t.Name == "IEntity" && t.IsInterface);
     _getNetworkIdMethod = iEntityType.GetMethod("get_NetworkId");
 
+    //Check if this is regarding the player
+    //Place player handling in seperate method
+    //Check if this is 
 
+
+
+
+    string displayName, classString, entityKind, race, nameText, subNameText, petOwnerIfAny, netId;
+    bool isPlayerAccessLevel;
+    long characterId;
+
+    var entityObject = GetEntityFromInstance(__instance, __0);
+
+    //its probably okay to do above before the player is loaded in. At some point it might be used to populate stuff
+    if (!MetricsPlayer.IsPlayerLoadedIntoScene)
+      return;
+
+    if (status == EntityStatusType.Dead && __1)
+      MetricsExperience.LastRegisteredDeath = entityObject;
+
+    MetricsLogging.LogMessageToConsole($"[SetOverride_Prefix] {entityObject.DisplayName}({entityObject.NetworkId}) - {entityObject.Class} - {entityObject.Relation} -  StatusType: {status}({__1})");
+
+    
+  }
+
+  private static EntityObject GetEntityFromInstance(object __instance, object __0)
+  {
     string displayName = String.Empty;
     string classString = String.Empty;
     bool isPlayerAccessLevel = false;
@@ -120,12 +168,13 @@ public class PantheonMetricsMain : MelonMod
     EntityRace entityRace = EntityRace.Horse;
 
     object entity = ResolveEntityFromLogic(__instance);
-    if (entity == null) return;
+    if (entity == null)
+      throw new Exception($"Could not ResolveEntityFromLogic");
 
-    if (entity is IEntity ient) 
+    if (entity is IEntity ient)
     {
       if (ient.Info != null)
-      { 
+      {
         displayName = ient.Info.DisplayName;
         classString = ient.Info.Class.ToString();
         characterId = ient.Info.CharacterId;
@@ -144,21 +193,29 @@ public class PantheonMetricsMain : MelonMod
 
 
     string netId = ResolveEntityNetworkId(entity);
-    if (string.IsNullOrEmpty(netId)) return;
+    //NetworkId(
 
-    var entityTypeString = entity.GetType().Namespace +"::"+ entity.GetType().Name;
+
+    if (string.IsNullOrEmpty(netId))
+      throw new Exception($"Could not ResolveEntityNetworkId");
+
+    
+
+
+    var entityTypeString = entity.GetType().Namespace + "::" + entity.GetType().Name;
     var zeroTypeName = __0.GetType().Namespace + "::" + __0.GetType().Name;
 
-
-    //if (status == EntityStatusType.Dead && __1)
-    //{
     EntityObject entityObject = null;
     if (isPlayerAccessLevel)
     {
       if (netId == MetricsPlayer.PlayerNetworkId)
         entityObject = new EntityObject(netId, displayName, classString, EntityRelationEnum.LocalPlayer);
       else
-        entityObject = new EntityObject(netId, displayName, classString, EntityRelationEnum.NonLocalPlayer);
+      {
+        MetricsLogging.LogMessageToConsole($"NonLocalPlayer: {netId}-{MetricsPlayer.PlayerNetworkId} = {netId == MetricsPlayer.PlayerNetworkId}");
+
+        entityObject = new EntityObject(netId, displayName, classString, EntityRelationEnum.NonLocalPlayer); 
+      }
     }
     else
     {
@@ -170,18 +227,18 @@ public class PantheonMetricsMain : MelonMod
         //case EntityRace.UndineArcamental: entityRelation = EntityRelationEnum.Pet; break;
         //case EntityRace.ZephyrArcamental: entityRelation = EntityRelationEnum.Pet; break;
         case EntityRace.Horse: entityRelation = EntityRelationEnum.Pet; break;
-        //case EntityRace.Wolf: entityRelation = EntityRelationEnum.Pet; break;
+          //case EntityRace.Wolf: entityRelation = EntityRelationEnum.Pet; break;
       }
 
 
       string owner = String.Empty;
       if (subNameText.EndsWith("Companion>"))//Shaman, Summoner
         owner = subNameText.Substring(1, subNameText.Length - 14);
-      if(subNameText.EndsWith("'s Minion>"))//Necro
+      if (subNameText.EndsWith("'s Minion>"))//Necro
         owner = subNameText.Substring(1, subNameText.Length - 11);
       if (subNameText.EndsWith("'s Ward>"))//Druid
         owner = subNameText.Substring(1, subNameText.Length - 9);
-      
+
 
       if (MetricsGroup.InGroup())
       {
@@ -191,30 +248,19 @@ public class PantheonMetricsMain : MelonMod
       }
       else
       {
-        if(MetricsPlayer.PlayerName == owner)
-        {
+        if (MetricsPlayer.IsPlayerLoadedIntoScene && MetricsPlayer.PlayerName == owner)//Because this can be called before the Player is loaded into the scene, player object can be null.
           petOwnerIfAny = MetricsPlayer.PlayerName;
-        }
       }
       //TODO does not handle players outside of group
 
       entityObject = new EntityObject(netId, displayName, classString, entityRelation);
       //TODO any situations left?
 
-    //}
-
-      MetricsExperience.LastRegisteredDeath = entityObject;
+      
     }
-
-
-    //its probably okay to do above before the player is loaded in. At some point it might be used to populate stuff
-    if (!MetricsPlayer.IsPlayerLoadedIntoScene)
-      return;
-
-
-    MetricsLogging.LogMessageToConsole($"[SetOverride_Prefix] {displayName}({netId}) - {classString} -  statusType: {status}({__1}): IsPlayer: {isPlayerAccessLevel}, characterId: {characterId}, Kind: {entityKind}, Race: {race}, nameText; {nameText}, subNameText: {subNameText}, Pet Owner: {petOwnerIfAny}");
+    //MetricsLogging.LogMessageToConsole($"[SetOverride_Prefix] {displayName}({netId}) - {classString} -  statusType: {status}({__1}): IsPlayer: {isPlayerAccessLevel}, characterId: {characterId}, Kind: {entityKind}, Race: {race}, nameText; {nameText}, subNameText: {subNameText}, Pet Owner: {petOwnerIfAny}");
+    return entityObject;
   }
-
 
 
   private static void Initialize()
@@ -278,6 +324,12 @@ public class PantheonMetricsMain : MelonMod
     try
     {
       var netId = _getNetworkIdMethod.Invoke(entity, null);
+
+      if (netId is Il2CppViNL.NetworkId n)
+      {
+        return n.Value.ToString();
+      } 
+
       return netId?.ToString();
     }
     catch { return null; }

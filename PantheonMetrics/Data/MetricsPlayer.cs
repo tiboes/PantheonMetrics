@@ -1,26 +1,45 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using HarmonyLib;
+﻿using HarmonyLib;
 using Il2Cpp;
 using MelonLoader;
 using PantheonMetrics.Data;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using UnityEngine;
+using UnityEngine.TextCore.Text;
+using static UnityEngine.Accessibility.AccessibilityManager;
 
 namespace PantheonMetrics.Data;
 
 public static class MetricsPlayer
 {
   public static bool IsPlayerLoadedIntoScene { get; set;  } = false;
-  public static string PlayerName { get; set; } = string.Empty;
-  
+  public static string PlayerName
+  {
+    get
+    {
+      if (PlayerGameObject ==  null)
+        MetricsLogging.LogMessageToConsole($"[MetricsPlayer.PlayerName] is null");
+      else if (PlayerGameObject.info == null)
+        MetricsLogging.LogMessageToConsole($"[MetricsPlayer.PlayerNam.Infoe] is null");
+
+
+      return PlayerGameObject.info.DisplayName;
+    }
+  } 
+  public static string PlayerNetworkId => PlayerGameObject?.NetworkId.Value.ToString() ?? "Unknown";
+
+
   private static float _maxHealth = 0;
   private static float _health =0;
-  public static bool CurrentlySubmerged { get; set; } = false;
+  //public static bool CurrentlySubmerged { get; set; } = false;
 
 
-  public static string PlayerNetworkId => PlayerGameObject?.NetworkId.Value.ToString() ?? "Unknown";
+
+
 
 
   public static EntityPlayerGameObject PlayerGameObject { get; set; }

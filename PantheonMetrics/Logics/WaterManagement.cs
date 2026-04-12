@@ -16,7 +16,7 @@ using UnityEngine;
 
 namespace PantheonMetrics.Logics;
 
-public  class WaterManagement
+public static  class WaterManagement
 {
   private static readonly int breathThresholdWarningLevel1 = 80;
   private static readonly int breathThresholdWarningLevel2 = 30;
@@ -34,6 +34,11 @@ public  class WaterManagement
 
   public static void HandleWaterLogic(EntityStatusType status, bool hasStatus)
   {
+    if (!MetricsConfiguration.BreathWarningEnabled || status != EntityStatusType.Submerged)
+      return;
+
+    MetricsLogging.LogMessageToConsole($"[WaterManagement.HandleWaterLogic] IN WATER HANDLING");
+
     if (status == EntityStatusType.Submerged && hasStatus)
     {
       var currentBreath = MetricsPlayer.CurrentBreath;

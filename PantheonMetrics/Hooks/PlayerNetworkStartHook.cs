@@ -33,18 +33,13 @@ public class PlayerNetworkStartHook
 
     if (__instance.NetworkId.Value == EntityPlayerGameObject.LocalPlayerId.Value)
     {
-      MetricsPlayer.PlayerName = __instance.info.DisplayName;
       MetricsPlayer.PlayerGameObject = __instance;
-      var initialHealth = MetricsPlayer.CurrentHealth;
-      uint playerNetworkId = __instance.NetworkId.Value;
-
       MetricsExperience.ResetExperience(__instance.Experience.Total);//TODO does this reset when switching zones?
-
-
-
-
-      MetricsLogging.LogMessageToConsole($"Loading in as [{MetricsPlayer.PlayerName}({MetricsPlayer.PlayerNetworkId})]. Total Health: {initialHealth}");
       MetricsPlayer.IsPlayerLoadedIntoScene = true;
+
+
+
+      MetricsLogging.LogMessageToConsole($"Loading in as [{MetricsPlayer.PlayerName}({MetricsPlayer.PlayerNetworkId})]. Health: {MetricsPlayer.CurrentHealth}/{MetricsPlayer.MaxHealth}");      
     }
 
   }

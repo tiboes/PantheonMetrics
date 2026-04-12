@@ -15,7 +15,7 @@ public class ExperienceHook
 {
   private static void Postfix(Experience.Logic __instance, int experience, bool levelUpEvent)
   {
-    if (!MetricsPlayer.IsPlayerLoadedIntoScene)
+    if (!MetricsConfiguration.ExperienceMetricEnabled || !MetricsPlayer.IsPlayerLoadedIntoScene)
       return;
     //if (levelUpEvent)
     //  MetricsExperience.CullOlderMessages(0);
