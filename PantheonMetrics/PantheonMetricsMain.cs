@@ -318,6 +318,7 @@ public class PantheonMetricsMain : MelonMod
     var _harmony = new HarmonyLib.Harmony("com.teiabo.pantheon.metrics");
     _harmony.Patch(_setOverrideMethod, prefix: new HarmonyMethod(prefix));
   }
+
   private static string ResolveEntityNetworkId(object entity)
   {
     if (entity == null || _getNetworkIdMethod == null) return null;
