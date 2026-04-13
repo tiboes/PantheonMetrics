@@ -16,11 +16,11 @@ public class LeftGroupHook
 
   private static void Postfix(Group.Logic __instance)
   {
+
     var updatedGroup = MetricsGroup.RefreshGroupMembers();
 
-    MetricsLogging.LogMessageToConsole($"[LeftGroupHook] - Group:{updatedGroup.ToStringDebug}");
-    MetricsLogging.LogMessageToInfoChat($"Group updated: {updatedGroup}");
-
+      //MetricsLogging.LogMessageToConsole($"[LeftGroupHook] - Group:{updatedGroup.ToStringDebug}");
+      //MetricsLogging.LogMessageToInfoChat($"Group updated: {updatedGroup}");
   }
 }
 
@@ -32,8 +32,8 @@ public class UpdateGroupMembersHook
   {
     var updatedGroup = MetricsGroup.RefreshGroupMembers();
 
-    MetricsLogging.LogMessageToConsole($"[UpdateGroupMembersHook] - Group:{updatedGroup.ToStringDebug()}");
-    MetricsLogging.LogMessageToInfoChat($"Group updated: {updatedGroup}");
+    //MetricsLogging.LogMessageToConsole($"[UpdateGroupMembersHook] - Group:{updatedGroup.ToStringDebug()}");
+    //MetricsLogging.LogMessageToInfoChat($"Group updated: {updatedGroup}");
   }
 }
 

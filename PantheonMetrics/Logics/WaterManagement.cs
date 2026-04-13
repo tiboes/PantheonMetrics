@@ -34,6 +34,7 @@ public static  class WaterManagement
 
   public static void HandleWaterLogic(EntityStatusType status, bool hasStatus)
   {
+    return;
     if (!MetricsConfiguration.BreathWarningEnabled || status != EntityStatusType.Submerged)
       return;
 

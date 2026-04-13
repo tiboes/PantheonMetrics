@@ -1,4 +1,5 @@
-﻿using Il2CppPantheonPersist;
+﻿using Il2Cpp;
+using Il2CppPantheonPersist;
 using PantheonMetrics.Objects;
 using System;
 using System.Collections.Generic;
@@ -15,17 +16,28 @@ public static class MetricsExperience
   private static List<ExperienceObject> experienceEarned = new List<ExperienceObject>();
   private static int lastRegisteredTotalExperience = 0;
   private static int lastRegisteredExperience = 0;
+  public static List<(DateTime time, string enemy, int experience)> LastKills { get; set; } = new List<(DateTime time, string enemy, int experience)>();
 
-  private static void ResetExperience()
+
+  public static void ResetExperience()
   {
-    lastRegisteredTotalExperience = 0;
-    experienceEarned = new List<ExperienceObject>();
+    if (MetricsPlayer.PlayerGameObject == null || MetricsPlayer.PlayerGameObject.Experience == null)
+      return;
+
+    ResetExperience(MetricsPlayer.PlayerGameObject.Experience.Total);
   }
 
   public static void ResetExperience(int currentExperience)
   {
+    //TODO mabye at some point we will need to reset at leveling or something. but today is not that day!
     lastRegisteredTotalExperience = currentExperience;
-    experienceEarned = new List<ExperienceObject>();
+    lastRegisteredExperience = 0;
+    experienceEarned.Clear();
+    LastKills.Clear();
+    LastRegisteredDeath = null;
+    TotalExperienceTheLast10MinCached = 0;
+    ExperiencePerMinTheLast10MinCached = 0;
+
   }
 
 
@@ -52,7 +64,14 @@ public static class MetricsExperience
       lastRegisteredTotalExperience = experience;
       experienceEarned.Add(new ExperienceObject(lastRegisteredExperience, experienceSource));
     }
-    
+    TotalExperienceTheLast10MinCached = GetExperienceTheLast10Mins();
+    ExperiencePerMinTheLast10MinCached = GetExperiencePerMin10MinSliding();
+
+    //MetricsLogging.LogMessageToConsole($"LasRegisteredExp: {lastRegisteredExperience}, inc exp: {experience}, {experienceSource.DisplayName}. No in LastKills: {LastKills.Count}");
+
+    LastKills.Add((DateTime.Now, experienceSource.DisplayName, lastRegisteredExperience));
+    if (LastKills.Count > 5)
+      LastKills.RemoveAt(0);//Make sure its only the last 5 entries in this list
   }
 
   public static EntityObject? LastRegisteredDeath { get; set; } = null;
@@ -91,6 +110,13 @@ public static class MetricsExperience
   }
 
   public static int GetExperienceSinceMinutes(int minutes) => GetExperienceSince(DateTime.UtcNow.AddMinutes(-minutes));
+
+  public static int TotalExperienceTheLast10MinCached { get; set; }
+  public static int ExperiencePerMinTheLast10MinCached { get; set; }
+
+
+
+
 
   public static void CullOlderMessages(int minutesToKeep)
   {
