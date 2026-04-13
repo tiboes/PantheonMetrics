@@ -25,11 +25,11 @@ public static  class WaterManagement
 
   public static void WaterBadlevel1()
   {
-    GUI.Label(new Rect(200, 200, 1000, 200), $"<b><color=Yellow><size=100>WATER..BAD</size></color></b>");
+    UnityEngine.GUI.Label(new Rect(200, 200, 1000, 200), $"<b><color=Yellow><size=100>WATER..BAD</size></color></b>");
   }
   public static void WaterBadlevel2()
   {
-    GUI.Label(new Rect(200, 200, 1000, 200), $"<b><color=Red><size=100>WATER..BAD</size></color></b>");
+    UnityEngine.GUI.Label(new Rect(200, 200, 1000, 200), $"<b><color=Red><size=100>WATER..BAD</size></color></b>");
   }
 
   public static void HandleWaterLogic(EntityStatusType status, bool hasStatus)
