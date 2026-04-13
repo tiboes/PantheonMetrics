@@ -15,6 +15,7 @@ public class ExperienceHook
 {
   private static void Postfix(Experience.Logic __instance, int experience, bool levelUpEvent)
   {
+
     if (!MetricsConfiguration.ExperienceMetricEnabled || !MetricsPlayer.IsPlayerLoadedIntoScene)
       return;
     //if (levelUpEvent)
@@ -35,8 +36,8 @@ public class ExperienceHook
     }
     if (killedMonster != null)
     {
-      MetricsLogging.LogMessageToInfoChat($"Killed {killedMonster}({MetricsExperience.GetLastExperienceGain()}) - Exp pr. min: {MetricsExperience.GetExperiencePerMin10MinSliding()}");
-      MetricsLogging.LogMessageToConsole($"Killed {killedMonster.ToStringDebug()} - Exp {MetricsExperience.GetLastExperienceGain()} - Exp Last Hour Total/Min:{MetricsExperience.GetExperienceTheLast10Mins()}/{MetricsExperience.GetExperiencePerMin10MinSliding()}");
+      //MetricsLogging.LogMessageToInfoChat($"Killed {killedMonster}({MetricsExperience.GetLastExperienceGain()}) - Exp pr. min: {MetricsExperience.GetExperiencePerMin10MinSliding()}");
+      //MetricsLogging.LogMessageToConsole($"Killed {killedMonster.ToStringDebug()} - Exp {MetricsExperience.GetLastExperienceGain()} - Exp Last Hour Total/Min:{MetricsExperience.GetExperienceTheLast10Mins()}/{MetricsExperience.GetExperiencePerMin10MinSliding()}");
     }
   }
 }

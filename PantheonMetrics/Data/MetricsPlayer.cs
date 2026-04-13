@@ -24,7 +24,7 @@ public static class MetricsPlayer
       if (PlayerGameObject ==  null)
         MetricsLogging.LogMessageToConsole($"[MetricsPlayer.PlayerName] is null");
       else if (PlayerGameObject.info == null)
-        MetricsLogging.LogMessageToConsole($"[MetricsPlayer.PlayerNam.Infoe] is null");
+        MetricsLogging.LogMessageToConsole($"[MetricsPlayer.PlayerNam.Info] is null");
 
 
       return PlayerGameObject.info.DisplayName;

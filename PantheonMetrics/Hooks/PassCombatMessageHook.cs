@@ -26,24 +26,24 @@ public class PassCombatMessageHook
 
   private static void Postfix(UIChatWindow __instance, IEntity attacker, IEntity defender, bool isDamage, string name, string message, ChatChannelType channel, CombatLogDirectionalFilter direction, CombatLogFilter filter, CombatLogPlayerFilter playerFilter)
   {
-    var attackerNetworkId = attacker.NetworkId;
-    var defenderNetworkId = defender.NetworkId;
+      var attackerNetworkId = attacker.NetworkId;
+      var defenderNetworkId = defender.NetworkId;
 
-    //Avoid duplicate messages
-    if (IsDuplicateMessage(message, attackerNetworkId, defenderNetworkId))
-      return;
+      //Avoid duplicate messages
+      if (IsDuplicateMessage(message, attackerNetworkId, defenderNetworkId))
+        return;
 
-    var attackerDisplayName = attacker.Info?.DisplayName;
-    var defenderDisplayName = defender.Info?.DisplayName;
-
-
-    //MetricsLogging.LogMessageToConsole($"[PassCombatMessage] - {attackerDisplayName} -> {defenderDisplayName} ({attackerNetworkId} -> {defenderNetworkId}) - {isDamage}|{direction}|{filter}|{playerFilter}");
+      var attackerDisplayName = attacker.Info?.DisplayName;
+      var defenderDisplayName = defender.Info?.DisplayName;
 
 
+      //MetricsLogging.LogMessageToConsole($"[PassCombatMessage] - {attackerDisplayName} -> {defenderDisplayName} ({attackerNetworkId} -> {defenderNetworkId}) - {isDamage}|{direction}|{filter}|{playerFilter}");
 
 
-    //Positive or negative?
-    //MetricsLogging.LogMessageToConsole($"[Attacker/Defender: {attackerDisplayName}/{defenderDisplayName}] - IsDamage[{isDamage} - {filter}] {channel}({direction}) - {playerFilter}  - Message: {message}");
+
+
+      //Positive or negative?
+      //MetricsLogging.LogMessageToConsole($"[Attacker/Defender: {attackerDisplayName}/{defenderDisplayName}] - IsDamage[{isDamage} - {filter}] {channel}({direction}) - {playerFilter}  - Message: {message}");
 
   }
 

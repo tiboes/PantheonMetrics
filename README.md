@@ -1,4 +1,6 @@
 # Pantheon Metrics
+TODO explanation of what this mod does!
+
 This project is a mod for Pantheon: Rise of the Fallen. 
 
 Development on this mod is ongoing, so expect changes to functionality and how it visually presents itself in game.

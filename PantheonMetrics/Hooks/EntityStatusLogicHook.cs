@@ -23,50 +23,40 @@ public static class EntityStatusLogicHook
       if (__instance == null)
         return;
 
-      WaterManagement.HandleWaterLogic(statusType, enabled);
+        WaterManagement.HandleWaterLogic(statusType, enabled);
 
-      List<EntityStatusType> allowedStatusTypes = new List<EntityStatusType>
-    {
-      EntityStatusType.InCombat,
-      EntityStatusType.Dead,
-      EntityStatusType.Pet,
-      EntityStatusType.PetFollowing,
-    };
+        List<EntityStatusType> allowedStatusTypes = new List<EntityStatusType>
+        {
+          EntityStatusType.InCombat,
+          EntityStatusType.Dead,
+          EntityStatusType.Pet,
+          EntityStatusType.PetFollowing,
+        };
 
-      if (!allowedStatusTypes.Contains(statusType))
-        return;
+        if (!allowedStatusTypes.Contains(statusType))
+          return;
 
+        //MetricsLogging.LogMessageToConsole($"EntityStatusLogicHook {statusType}-{enabled}");
 
-      //var iEntityType = _il2cppAsm.GetType("Il2Cpp.IEntity")
-      //           ?? _il2cppAsm.GetTypes().FirstOrDefault(t => t.Name == "IEntity" && t.IsInterface);
-      //_getNetworkIdMethod = iEntityType.GetMethod("get_NetworkId");
-
-      //Check if this is regarding the player
-      //Place player handling in seperate method
-      //Check if this is 
+        string displayName, classString, entityKind, race, nameText, subNameText, petOwnerIfAny, netId;
+        bool isPlayerAccessLevel;
+        long characterId;
 
 
+        var entityObject = CreateEntityObject(__instance.Entity, (statusType, enabled));
 
+        //its probably okay to do above before the player is loaded in. At some point it might be used to populate stuff
+        if (!MetricsPlayer.IsPlayerLoadedIntoScene)
+          return;
 
-      string displayName, classString, entityKind, race, nameText, subNameText, petOwnerIfAny, netId;
-      bool isPlayerAccessLevel;
-      long characterId;
+        if (statusType == EntityStatusType.Dead && enabled)
+          MetricsExperience.LastRegisteredDeath = entityObject;
 
-
-      var entityObject = CreateEntityObject(__instance.Entity);
-
-      //its probably okay to do above before the player is loaded in. At some point it might be used to populate stuff
-      if (!MetricsPlayer.IsPlayerLoadedIntoScene)
-        return;
-
-      if (statusType == EntityStatusType.Dead && enabled)
-        MetricsExperience.LastRegisteredDeath = entityObject;
-
-      MetricsLogging.LogMessageToConsole($"[EntityStatusLogicHook.PreFix] {entityObject.DisplayName}({entityObject.NetworkId}) - {entityObject.Class} - {entityObject.Relation} -  StatusType: {statusType}({enabled})");
+        //MetricsLogging.LogMessageToConsole($"[EntityStatusLogicHook.PreFix] {entityObject.DisplayName}({entityObject.NetworkId}) - {entityObject.Class} - {entityObject.Relation} -  StatusType: {statusType}({enabled})");
     }
   }
 
-  private static EntityObject CreateEntityObject(IEntity entity)
+  private static EntityObject CreateEntityObject(IEntity entity, (EntityStatusType statusType, bool enabled) debugInfo)
   {
     string displayName = String.Empty;
     string classString = String.Empty;
@@ -81,7 +71,6 @@ public static class EntityStatusLogicHook
     EntityRace entityRace = EntityRace.Horse;
 
 
-
     //MetricsLogging.LogMessageToConsole($"entity: entityAssembly: {entityAssembly}, entitynameSpace: {entitynameSpace}, entityname: {entityname}, entityFullName: {entityFullName},entityDescription: {entityDescription}, entityTypeInfo:{entityTypeInfo}");
 
 
@@ -94,15 +83,19 @@ public static class EntityStatusLogicHook
       race = entity.Info.Race.ToString();
       entityRace = entity.Info.Race;
 
-      EntityNameplate nameplate = entity.Nameplate;
-      nameText = nameplate.nameText.text;
-      subNameText = nameplate.subNameText.text;
-      levelText = nameplate.levelText.text;
+
+      if (entity.Nameplate != null)
+      {
+        EntityNameplate nameplate = entity.Nameplate;
+        nameText = nameplate.nameText.text;
+        subNameText = nameplate.subNameText.text;
+        levelText = nameplate.levelText.text;
+      }
+
+
 
       isPlayerAccessLevel = entity.Info.AccessLevel == AccessLevel.Player;
     }
-
-
 
 
 
@@ -114,13 +107,19 @@ public static class EntityStatusLogicHook
     EntityObject entityObject = null;
     if (isPlayerAccessLevel)
     {
+
+
       if (netId == MetricsPlayer.PlayerNetworkId)
         entityObject = new EntityObject(netId, displayName, classString, EntityRelationEnum.LocalPlayer);
       else
         entityObject = new EntityObject(netId, displayName, classString, EntityRelationEnum.NonLocalPlayer);
+
+
+
     }
     else
     {
+
       var entityRelation = EntityRelationEnum.Monster;
       switch (entityRace)
       {
@@ -153,6 +152,8 @@ public static class EntityStatusLogicHook
         if (MetricsPlayer.IsPlayerLoadedIntoScene && MetricsPlayer.PlayerName == owner)//Because this can be called before the Player is loaded into the scene, player object can be null.
           petOwnerIfAny = MetricsPlayer.PlayerName;
       }
+
+
       //TODO does not handle players outside of group
 
       entityObject = new EntityObject(netId, displayName, classString, entityRelation);
@@ -160,6 +161,7 @@ public static class EntityStatusLogicHook
 
 
     }
+
     //MetricsLogging.LogMessageToConsole($"[SetOverride_Prefix] {displayName}({netId}) - {classString} -  statusType: {status}({__1}): IsPlayer: {isPlayerAccessLevel}, characterId: {characterId}, Kind: {entityKind}, Race: {race}, nameText; {nameText}, subNameText: {subNameText}, Pet Owner: {petOwnerIfAny}");
     return entityObject;
   }

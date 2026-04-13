@@ -38,6 +38,6 @@ public class TargetLogicHook
     //  var currentHealth = off.Pools.GetCurrent(PoolType.Health);
     //  MetricsLogging.LogMessageToConsole($"TargetSetOffensiveHook. MaxHealth: {maxHealth}, CurrentHealth: {currentHealth}");
     //}
-    
+
   }
 }
