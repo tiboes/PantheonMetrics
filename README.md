@@ -1,9 +1,12 @@
 # Pantheon Metrics
-TODO explanation of what this mod does!
+Latest release: 1.0.0
 
 This project is a mod for Pantheon: Rise of the Fallen. 
 
 Development on this mod is ongoing, so expect changes to functionality and how it visually presents itself in game.
+
+This mod adds an experience counter that shows exp earned in the last 10 minutes, the average exp per minute during the last 10 minutes, as well as the last 5 kills.
+
 
 ## Installation
 Install MelonLoader, following along with their [installation instructions](https://melonwiki.xyz/#/?id=requirements)
@@ -24,3 +27,6 @@ This repository contains 1 project. Once the solution is built, the following DL
 * `PantheonMetrics.dll`, which goes in the `/mods` directory in your game installation. Note that this dll is automatically put in the `/mods` directory do you do not need to perform any copying yourself.
 
 Depending on where the source code is located, the project may fail to resolve the dependency libraries. You'll need to remove all library references and re-add them at the correct path.
+
+## Known bugs and issues
+* Logging resets on death and on zone loads
