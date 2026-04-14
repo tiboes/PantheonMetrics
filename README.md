@@ -30,3 +30,4 @@ Depending on where the source code is located, the project may fail to resolve t
 
 ## Known bugs and issues
 * Logging resets on death and on zone loads
+* At points the GU appears to shut down. relogging or changing zones seems to reload
