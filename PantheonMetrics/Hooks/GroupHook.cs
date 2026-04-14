@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace PantheonMetrics.Hooks;
 
-[HarmonyPatch(typeof(Group.Logic), nameof(Group.Logic.LeftGroup))]
+//[HarmonyPatch(typeof(Group.Logic), nameof(Group.Logic.LeftGroup))]
 public class LeftGroupHook
 {
 
@@ -24,7 +24,7 @@ public class LeftGroupHook
   }
 }
 
-[HarmonyPatch(typeof(Group.Logic), nameof(Group.Logic.UpdateGroupMembers))]
+//[HarmonyPatch(typeof(Group.Logic), nameof(Group.Logic.UpdateGroupMembers))]
 public class UpdateGroupMembersHook
 {
 

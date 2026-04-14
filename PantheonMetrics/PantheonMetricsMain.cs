@@ -55,17 +55,19 @@ public class PantheonMetricsMain : MelonMod
 
   public override void OnUpdate()
   {
+    //
+    var now = DateTime.Now;
+    if (_lastAliveCheck < now.AddSeconds(-60))
+    {
+      _lastAliveCheck = now;
+      //MetricsLogging.LogMessageToConsole($"Mod Alive Check. Player in scene: {MetricsPlayer.IsPlayerLoadedIntoScene}, GameplayerObject is null - {MetricsPlayer.PlayerGameObject == null} - { MetricsPlayer.PlayerGameObject?.NetworkId.ToString()}");
+    }
   }
 
   
   public override void OnGUI()
   {
-    var now = DateTime.Now;
-    if (_lastAliveCheck < now.AddSeconds(-30))
-    {
-      _lastAliveCheck = now;
-      //MetricsLogging.LogMessageToConsole($"Mod Alive Check");
-    }
+    
 
 
     if (!MetricsPlayer.IsPlayerLoadedIntoScene)

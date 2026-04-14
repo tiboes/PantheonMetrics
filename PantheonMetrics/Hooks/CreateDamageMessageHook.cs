@@ -11,7 +11,7 @@ using Il2CppLogicalGraphNodes;
 namespace PantheonMetrics.Hooks;
 
 //[HarmonyPatch(typeof(UIChatWindows), nameof(UIChatWindows.CreateDamageMessage), typeof(string), typeof(int), typeof(string), typeof(string), typeof(CombatResultType), typeof(DamageType), typeof(CombatLogDirectionalFilter), typeof(CombatLogFilter), typeof(bool), typeof(float))]
-[HarmonyPatch(typeof(UIChatWindows), nameof(UIChatWindows.CreateDamageMessage))]
+//[HarmonyPatch(typeof(UIChatWindows), nameof(UIChatWindows.CreateDamageMessage))]
 public  class CreateDamageMessageHook
 {
 

@@ -21,11 +21,10 @@ public static class MetricsPlayer
   {
     get
     {
-      if (PlayerGameObject ==  null)
-        MetricsLogging.LogMessageToConsole($"[MetricsPlayer.PlayerName] is null");
-      else if (PlayerGameObject.info == null)
-        MetricsLogging.LogMessageToConsole($"[MetricsPlayer.PlayerNam.Info] is null");
-
+      if (PlayerGameObject ==  null && PlayerGameObject.info == null)
+      {
+        return "NOT SET";
+      }
 
       return PlayerGameObject.info.DisplayName;
     }

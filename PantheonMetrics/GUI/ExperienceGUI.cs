@@ -42,10 +42,10 @@ public static class ExperienceGUI
     if (!enabled)
     {
       var rectPlayBtn = new UnityEngine.Rect(0, y, _debugWindowRect.x, _debugWindowRect.x);
-      if (UnityEngine.GUI.Button(rectPlayBtn, ">", buttonStyleStopped))
+      if (UnityEngine.GUI.Button(rectPlayBtn, "v", buttonStyleStopped))
       {
         MetricsConfiguration.ExperienceMetricEnabled = true;
-        MetricsLogging.LogMessageToInfoChat($"Experience logging has resumed.");
+        MetricsLogging.LogMessageToInfoChat($"[Metrics] Experience logging has resumed.");
       }
       return;
     }
@@ -63,17 +63,17 @@ public static class ExperienceGUI
     var rectExpPerMin = new UnityEngine.Rect(x, y + (3 * titleH), w, titleH);
     var rectExpHististory = new UnityEngine.Rect(x, y + (4 * titleH), w, titleH * 5);
 
-    if (UnityEngine.GUI.Button(rectPauseBtn, "||", buttonStyleStartted))
+    if (UnityEngine.GUI.Button(rectPauseBtn, "", buttonStyleStartted))
     {
       MetricsConfiguration.ExperienceMetricEnabled = false;
-      MetricsLogging.LogMessageToInfoChat($"Experience logging has been suspended.");
+      MetricsLogging.LogMessageToInfoChat($"[Metrics] Experience logging has been suspended.");
       return;
     }
 
     if (UnityEngine.GUI.Button(rectPauseResetBtn, "R", buttonStyleResetExperience))
     {
       MetricsExperience.ResetExperience();
-      MetricsLogging.LogMessageToInfoChat($"Experience logging has been reset.");
+      MetricsLogging.LogMessageToInfoChat($"[Metrics] Experience logging has been reset.");
     }
 
     var collapsableTxt = GUIUtils.GetGUIText((ShowExperiencePanel ? "<" : ">"), (ShowExperiencePanel ? "Grey" : "Grey"), (int)(lineH - 1), true);
@@ -84,7 +84,7 @@ public static class ExperienceGUI
 
     if (ShowExperiencePanel)
     {
-      UnityEngine.GUI.Box(rectHeader, GUIUtils.GetGUIText($"Pantheon Metrics {PantheonMetricsMain.ModVersion}", "Red", (int)(lineH - 1), true), boxStyle);
+      UnityEngine.GUI.Box(rectHeader, GUIUtils.GetGUIText($"Pantheon Metrics v{PantheonMetricsMain.ModVersion}", "Red", (int)(lineH - 1), true), boxStyle);
       UnityEngine.GUI.Box(rectExpLastPeriod, GUIUtils.GetGUIText($" Total 10 min: {MetricsExperience.TotalExperienceTheLast10MinCached.ToString("N0", CultureInfo.CurrentUICulture)}", "White", (int)(lineH - 5), true), boxStyle);
       UnityEngine.GUI.Box(rectExpPerMin, GUIUtils.GetGUIText($@" Average/min: {MetricsExperience.ExperiencePerMinTheLast10MinCached.ToString("N0", CultureInfo.CurrentUICulture)}", "White", (int)(lineH - 5), true), boxStyle);
 
