@@ -2,6 +2,7 @@ using HarmonyLib;
 using Il2Cpp;
 using MelonLoader;
 using PantheonMetrics.Data;
+using PantheonMetrics.GUI;
 
 namespace PantheonMetrics.Hooks;
 
@@ -27,6 +28,8 @@ public class PlayerNetworkStartHook
       MetricsPlayer.PlayerGameObject = __instance;
       MetricsExperience.ResetExperience(__instance.Experience.Total);//TODO does this reset when switching zones?
       MetricsPlayer.IsPlayerLoadedIntoScene = true;
+      ExperienceGUI.InitializeRenderObjects();
+
 
       MetricsLogging.LogMessageToConsole($"Loading in as [{MetricsPlayer.PlayerName}({MetricsPlayer.PlayerNetworkId})]. Health: {MetricsPlayer.CurrentHealth}/{MetricsPlayer.MaxHealth}");      
     }

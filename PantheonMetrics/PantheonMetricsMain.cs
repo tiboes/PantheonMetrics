@@ -62,9 +62,9 @@ public class PantheonMetricsMain : MelonMod
       return;
 
     if (MetricsConfiguration.ExperienceMetricEnabled)
-      ExperienceGUI.Render();
-
-
+      ExperienceGUI.Render(true);
+    else
+      ExperienceGUI.Render(false);
   }
 
 
