@@ -37,15 +37,14 @@ public static class MetricsExperience
     LastRegisteredDeath = null;
     TotalExperienceTheLast10MinCached = 0;
     ExperiencePerMinTheLast10MinCached = 0;
-
   }
-
 
   public static EntityObject? AddExperience(int experience)
   {
     var last = LastRegisteredDeath;
-    if (last == null)
+    if (last == null || last.Relation != EntityRelationEnum.Monster)
       return null;
+    
 
     AddExperience(experience, last);
     return last;
@@ -67,8 +66,6 @@ public static class MetricsExperience
     TotalExperienceTheLast10MinCached = GetExperienceTheLast10Mins();
     ExperiencePerMinTheLast10MinCached = GetExperiencePerMin10MinSliding();
 
-    //MetricsLogging.LogMessageToConsole($"LasRegisteredExp: {lastRegisteredExperience}, inc exp: {experience}, {experienceSource.DisplayName}. No in LastKills: {LastKills.Count}");
-
     LastKills.Add((DateTime.Now, experienceSource.DisplayName, lastRegisteredExperience));
     if (LastKills.Count > 5)
       LastKills.RemoveAt(0);//Make sure its only the last 5 entries in this list
@@ -82,9 +79,6 @@ public static class MetricsExperience
   public static int GetExperienceSince(DateTime time) => experienceEarned.Where(e => e.EarnedTime >= time).Sum(y=> y.Experience);
 
   public static int GetExperienceTheLast10Mins() => GetExperienceSinceMinutes(10);
-  //public static int GetExperienceTheLastFiveMinutes() => GetExperienceSinceMinutes(5);
-
-  //public static decimal GetExperiencePerMinuteOverLastFiveminutes() => GetExperienceTheLastFiveMinutes() / 5;
 
   public static int GetExperiencePerMin10MinSliding()
   {
@@ -114,15 +108,9 @@ public static class MetricsExperience
   public static int TotalExperienceTheLast10MinCached { get; set; }
   public static int ExperiencePerMinTheLast10MinCached { get; set; }
 
-
-
-
-
   public static void CullOlderMessages(int minutesToKeep)
   {
     experienceEarned = experienceEarned.Where(e => e.EarnedTime >= DateTime.UtcNow.AddMinutes(-minutesToKeep)).ToList();
   }
-
-
 
 }
