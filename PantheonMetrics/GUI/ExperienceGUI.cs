@@ -21,7 +21,6 @@ namespace PantheonMetrics.GUI;
 public static class ExperienceGUI
 {
   private static UnityEngine.Rect _debugWindowRect = new UnityEngine.Rect(15, 50, 300, 130);
-  //private static UnityEngine.Rect _debugWindowRect = new UnityEngine.Rect(10, 50, 380, 130);
 
   private static Texture2D backgroundTexture = null;
   private static GUIStyle buttonStyleActivated = null;
@@ -29,20 +28,17 @@ public static class ExperienceGUI
   private static GUIStyle buttonStyleStartted = null;
   private static GUIStyle buttonStyleResetExperience = null;
   private static GUIStyle boxStyle = null;
+  private static float x = _debugWindowRect.x;
+  private static float y = _debugWindowRect.y;
+  private static float w = _debugWindowRect.width;
+  private static float titleH = 24f;
+  private static float lineH = 18f;
+
 
   private static bool ShowExperiencePanel { get; set; } = true;
 
   public static void Render(bool enabled)
   {
-    
-
-
-    float x = _debugWindowRect.x;
-    float y = _debugWindowRect.y;
-    float w = _debugWindowRect.width;
-    float titleH = 24f;
-    float lineH = 18f;
-
     if (!enabled)
     {
       var rectPlayBtn = new UnityEngine.Rect(0, y, _debugWindowRect.x, _debugWindowRect.x);
@@ -101,7 +97,6 @@ public static class ExperienceGUI
         var rectExpEntry = new UnityEngine.Rect(x, rectExpHististory.y + (i * titleH), w, titleH);
         UnityEngine.GUI.Label(rectExpEntry, GUIUtils.GetGUIText($@"{entry.time: HH:mm:ss}: {entry.enemy}({entry.experience.ToString("N0", CultureInfo.CurrentUICulture)})", "White", (int)(lineH - 5)));
       }
-
     }
   }
 
@@ -111,9 +106,7 @@ public static class ExperienceGUI
       backgroundTexture.MarkDirty();
 
     backgroundTexture = MakeTex(2, 2, new Color(0.1f, 0.1f, 0.1f, 0.5f));
-    MetricsLogging.LogMessageToInfoChat($"Loading Textures.");
     CreateStyles();
-    MetricsLogging.LogMessageToInfoChat($"Loading Styles.");
   }
 
 

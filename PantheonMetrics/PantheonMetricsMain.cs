@@ -21,7 +21,7 @@ namespace PantheonMetrics;
 
 public class PantheonMetricsMain : MelonMod
 {
-  public const string ModVersion = "0.0.1";
+  public const string ModVersion = "1.0.0";
 
 
   private static PropertyInfo _statusLogicEntityProp;    // EntityStatus.Logic.Entity → IEntity
@@ -60,11 +60,8 @@ public class PantheonMetricsMain : MelonMod
   {
     if (!MetricsPlayer.IsPlayerLoadedIntoScene)
       return;
-
-    if (MetricsConfiguration.ExperienceMetricEnabled)
-      ExperienceGUI.Render(true);
-    else
-      ExperienceGUI.Render(false);
+    
+    ExperienceGUI.Render(MetricsConfiguration.ExperienceMetricEnabled);
   }
 
 

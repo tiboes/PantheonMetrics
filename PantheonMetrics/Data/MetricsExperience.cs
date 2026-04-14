@@ -44,8 +44,8 @@ public static class MetricsExperience
     var last = LastRegisteredDeath;
     if (last == null || last.Relation != EntityRelationEnum.Monster)
       return null;
-    
 
+    
     AddExperience(experience, last);
     return last;
   }
@@ -69,6 +69,7 @@ public static class MetricsExperience
     LastKills.Add((DateTime.Now, experienceSource.DisplayName, lastRegisteredExperience));
     if (LastKills.Count > 5)
       LastKills.RemoveAt(0);//Make sure its only the last 5 entries in this list
+
   }
 
   public static EntityObject? LastRegisteredDeath { get; set; } = null;
