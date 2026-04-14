@@ -16,7 +16,7 @@ using UnityEngine;
 
 namespace PantheonMetrics.Hooks;
 
-[HarmonyPatch(typeof(UIChatWindow), nameof(UIChatWindow.PassCombatMessage))]
+//[HarmonyPatch(typeof(UIChatWindow), nameof(UIChatWindow.PassCombatMessage))]
 public class PassCombatMessageHook
 {
   private static long _lastMessageTime = 0;

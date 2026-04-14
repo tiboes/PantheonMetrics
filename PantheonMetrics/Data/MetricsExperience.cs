@@ -16,6 +16,8 @@ public static class MetricsExperience
   private static List<ExperienceObject> experienceEarned = new List<ExperienceObject>();
   private static int lastRegisteredTotalExperience = 0;
   private static int lastRegisteredExperience = 0;
+  private static readonly int expSlidingTime = 10;
+  private static readonly int expSlidingTimeDeleteFromList = 60;
   public static List<(DateTime time, string enemy, int experience)> LastKills { get; set; } = new List<(DateTime time, string enemy, int experience)>();
 
 
@@ -47,6 +49,7 @@ public static class MetricsExperience
 
     
     AddExperience(experience, last);
+    experienceEarned.RemoveAll(r => r.EarnedTime <= DateTime.UtcNow.AddMinutes(-expSlidingTimeDeleteFromList));
     return last;
   }
   public static void AddExperience(int experience, EntityObject experienceSource)
@@ -79,13 +82,13 @@ public static class MetricsExperience
   
   public static int GetExperienceSince(DateTime time) => experienceEarned.Where(e => e.EarnedTime >= time).Sum(y=> y.Experience);
 
-  public static int GetExperienceTheLast10Mins() => GetExperienceSinceMinutes(10);
+  public static int GetExperienceTheLast10Mins() => GetExperienceSinceMinutes(expSlidingTime);
 
   public static int GetExperiencePerMin10MinSliding()
   {
     //if the earliest exp gain is before 10 mins we need to take that as the offset
     var now = DateTime.UtcNow;
-    var relevantExps = experienceEarned.Where(e => e.EarnedTime >= now.AddMinutes(-10)).ToList();
+    var relevantExps = experienceEarned.Where(e => e.EarnedTime >= now.AddMinutes(-expSlidingTime)).ToList();
     if(relevantExps.Count == 1)
     {
       return (int)(relevantExps.Sum(r => r.Experience));
@@ -99,7 +102,7 @@ public static class MetricsExperience
       return (int)(relevantExps.Sum(r => r.Experience) / diffInMinsFraction);
     }
 
-    var exp = GetExperienceTheLast10Mins() / 10;
+    var exp = GetExperienceTheLast10Mins() / expSlidingTime;
 
     return exp;
   }

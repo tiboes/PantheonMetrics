@@ -23,36 +23,46 @@ public static class EntityStatusLogicHook
       if (__instance == null)
         return;
 
-        WaterManagement.HandleWaterLogic(statusType, enabled);
 
-        List<EntityStatusType> allowedStatusTypes = new List<EntityStatusType>
-        {
-          EntityStatusType.InCombat,
-          EntityStatusType.Dead,
-          EntityStatusType.Pet,
-          EntityStatusType.PetFollowing,
-        };
-
-        if (!allowedStatusTypes.Contains(statusType))
-          return;
-
-        //MetricsLogging.LogMessageToConsole($"EntityStatusLogicHook {statusType}-{enabled}");
-
-        string displayName, classString, entityKind, race, nameText, subNameText, petOwnerIfAny, netId;
-        bool isPlayerAccessLevel;
-        long characterId;
+      if (PlayerNetworkStartHook.exitMessageReceieved)
+      {
+        MetricsLogging.LogMessageToConsole($"Incorrect Logging Message Received...Ignoring");
+        PlayerNetworkStartHook.exitMessageReceieved = false;
+        MetricsPlayer.IsPlayerLoadedIntoScene = true;
+      }
 
 
-        var entityObject = CreateEntityObject(__instance.Entity, (statusType, enabled));
 
-        //its probably okay to do above before the player is loaded in. At some point it might be used to populate stuff
-        if (!MetricsPlayer.IsPlayerLoadedIntoScene)
-          return;
+      WaterManagement.HandleWaterLogic(statusType, enabled);
 
-        if (statusType == EntityStatusType.Dead && enabled)
-          MetricsExperience.LastRegisteredDeath = entityObject;
+      List<EntityStatusType> allowedStatusTypes = new List<EntityStatusType>
+      {
+        EntityStatusType.InCombat,
+        EntityStatusType.Dead,
+        EntityStatusType.Pet,
+        EntityStatusType.PetFollowing,
+      };
 
-        //MetricsLogging.LogMessageToConsole($"[EntityStatusLogicHook.PreFix] {entityObject.DisplayName}({entityObject.NetworkId}) - {entityObject.Class} - {entityObject.Relation} -  StatusType: {statusType}({enabled})");
+      if (!allowedStatusTypes.Contains(statusType))
+        return;
+
+      //MetricsLogging.LogMessageToConsole($"EntityStatusLogicHook {statusType}-{enabled}");
+
+      string displayName, classString, entityKind, race, nameText, subNameText, petOwnerIfAny, netId;
+      bool isPlayerAccessLevel;
+      long characterId;
+
+
+      var entityObject = CreateEntityObject(__instance.Entity, (statusType, enabled));
+
+      //its probably okay to do above before the player is loaded in. At some point it might be used to populate stuff
+      if (!MetricsPlayer.IsPlayerLoadedIntoScene)
+        return;
+
+      if (statusType == EntityStatusType.Dead && enabled)
+        MetricsExperience.LastRegisteredDeath = entityObject;
+
+      //MetricsLogging.LogMessageToConsole($"[EntityStatusLogicHook.PreFix] {entityObject.DisplayName}({entityObject.NetworkId}) - {entityObject.Class} - {entityObject.Relation} -  StatusType: {statusType}({enabled})");
     }
   }
 

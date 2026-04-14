@@ -9,6 +9,9 @@ namespace PantheonMetrics.Hooks;
 [HarmonyPatch(typeof(EntityPlayerGameObject), nameof(EntityPlayerGameObject.NetworkStart))]
 public class PlayerNetworkStartHook
 {
+  public static bool exitMessageReceieved { get; set; } = false;
+
+
   private static void Prefix(EntityPlayerGameObject __instance)
   {
     // Fired in character select
@@ -31,7 +34,8 @@ public class PlayerNetworkStartHook
       ExperienceGUI.InitializeRenderObjects();
 
 
-      MetricsLogging.LogMessageToConsole($"Loading in as [{MetricsPlayer.PlayerName}({MetricsPlayer.PlayerNetworkId})]. Health: {MetricsPlayer.CurrentHealth}/{MetricsPlayer.MaxHealth}");      
+      MetricsLogging.LogMessageToConsole($"Loading in as [{MetricsPlayer.PlayerName}({MetricsPlayer.PlayerNetworkId})]. Health: {MetricsPlayer.CurrentHealth}/{MetricsPlayer.MaxHealth}");
+      exitMessageReceieved = false;
     }
   }
 }
@@ -45,12 +49,13 @@ public class PlayerNetworkStopHook
     if (__instance == null || __instance.NetworkId.Value == 1)
       return;
 
-    MetricsLogging.LogMessageToConsole($"Logging Character {MetricsPlayer.PlayerName}");
+    MetricsLogging.LogMessageToConsole($"Character {MetricsPlayer.PlayerName} has logged.");
 
-    //Do clean up
-    //MetricsPlayer.PlayerGameObject = null;
     MetricsPlayer.IsPlayerLoadedIntoScene = false;
-      //MetricsExperience.ResetExperience();
+
+
+    //Sometimes we randomly receive a NetworkStop even though we are still in scene. Setting this to true, and then checking in SetOverride if we reveive messages. If we do it was a false Stop and we should set IsPlayerLoadedIntoScene to true again.
+    PlayerNetworkStartHook.exitMessageReceieved = true;
   }
 
 }
