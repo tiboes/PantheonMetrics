@@ -19,9 +19,11 @@ using static Il2CppSystem.Xml.XmlTextReaderImpl;
 
 namespace PantheonMetrics;
 
+
 public class PantheonMetricsMain : MelonMod
 {
-  public const string ModVersion = "1.0.0";
+  public const string ModVersion = "1.0.1";
+  private DateTime _lastAliveCheck = DateTime.MinValue;
 
 
   private static PropertyInfo _statusLogicEntityProp;    // EntityStatus.Logic.Entity → IEntity
@@ -58,6 +60,14 @@ public class PantheonMetricsMain : MelonMod
   
   public override void OnGUI()
   {
+    var now = DateTime.Now;
+    if (_lastAliveCheck < now.AddSeconds(-30))
+    {
+      _lastAliveCheck = now;
+      //MetricsLogging.LogMessageToConsole($"Mod Alive Check");
+    }
+
+
     if (!MetricsPlayer.IsPlayerLoadedIntoScene)
       return;
     

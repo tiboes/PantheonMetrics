@@ -26,40 +26,67 @@ public class PassCombatMessageHook
 
   private static void Postfix(UIChatWindow __instance, IEntity attacker, IEntity defender, bool isDamage, string name, string message, ChatChannelType channel, CombatLogDirectionalFilter direction, CombatLogFilter filter, CombatLogPlayerFilter playerFilter)
   {
-      var attackerNetworkId = attacker.NetworkId;
-      var defenderNetworkId = defender.NetworkId;
+    //NOTE THAT When someone (or a pet) dies there can be a message where the attacker is null
+    //Since im not using any of this code right now it is disabled
+    return;
 
-      //Avoid duplicate messages
-      if (IsDuplicateMessage(message, attackerNetworkId, defenderNetworkId))
-        return;
-
-      var attackerDisplayName = attacker.Info?.DisplayName;
-      var defenderDisplayName = defender.Info?.DisplayName;
-
-
-      //MetricsLogging.LogMessageToConsole($"[PassCombatMessage] - {attackerDisplayName} -> {defenderDisplayName} ({attackerNetworkId} -> {defenderNetworkId}) - {isDamage}|{direction}|{filter}|{playerFilter}");
-
-
+    if (attacker == null)
+    {
+      MetricsLogging.LogMessageToConsole($"[PassCombatMessageHook] Attacker is null, name: {name}, message: {message}");
+    }
+    if (defender == null)
+    {
+      MetricsLogging.LogMessageToConsole($"[PassCombatMessageHook] defender is null, name: {name}, message: {message}");
+    }
 
 
-      //Positive or negative?
-      //MetricsLogging.LogMessageToConsole($"[Attacker/Defender: {attackerDisplayName}/{defenderDisplayName}] - IsDamage[{isDamage} - {filter}] {channel}({direction}) - {playerFilter}  - Message: {message}");
+    var attackerNetworkId = attacker.NetworkId;
+    var defenderNetworkId = defender.NetworkId;
+
+    //Avoid duplicate messages
+    if (IsDuplicateMessage(message, attackerNetworkId, defenderNetworkId))
+      return;
+
+    
+
+    var attackerDisplayName = attacker.Info?.DisplayName;
+    var defenderDisplayName = defender.Info?.DisplayName;
+
+
+    //MetricsLogging.LogMessageToConsole($"[PassCombatMessage] - {attackerDisplayName} -> {defenderDisplayName} ({attackerNetworkId} -> {defenderNetworkId}) - {isDamage}|{direction}|{filter}|{playerFilter}");
+
+
+
+
+    //Positive or negative?
+    //MetricsLogging.LogMessageToConsole($"[Attacker/Defender: {attackerDisplayName}/{defenderDisplayName}] - IsDamage[{isDamage} - {filter}] {channel}({direction}) - {playerFilter}  - Message: {message}");
 
   }
 
   private static bool IsDuplicateMessage(string message, Il2CppViNL.NetworkId attackerNetworkId, Il2CppViNL.NetworkId defenderNetworkId)
   {
-    var currentMessageTime = DateTime.UtcNow.Ticks;
-    if (_lastMessageTime == 0)
-      _lastMessageTime = currentMessageTime;
+    try
+    {
+      var currentMessageTime = DateTime.UtcNow.Ticks;
+      if (_lastMessageTime == 0)
+        _lastMessageTime = currentMessageTime;
 
-    var timeSinceLastMessage = currentMessageTime - _lastMessageTime;
-    var currentMessageHash = $"{attackerNetworkId.Value}-{defenderNetworkId.Value}-{message}".GetHashCode();
+      var timeSinceLastMessage = currentMessageTime - _lastMessageTime;
+      var currentMessageHash = $"{attackerNetworkId.Value}-{defenderNetworkId.Value}-{message}".GetHashCode();
 
 
-    var result = timeSinceLastMessage != 0 && currentMessageHash == _hashOfLastMessage && timeSinceLastMessage < MaxAllowedTicksBetweenSimilarMessages;
-    _lastMessageTime = currentMessageTime;//make sure to update the last time
-    _hashOfLastMessage = currentMessageHash;
-    return result;
+      var result = timeSinceLastMessage != 0 && currentMessageHash == _hashOfLastMessage && timeSinceLastMessage < MaxAllowedTicksBetweenSimilarMessages;
+      _lastMessageTime = currentMessageTime;//make sure to update the last time
+      _hashOfLastMessage = currentMessageHash;
+      return result;
+
+    } catch (Exception ex) 
+    {
+      MetricsLogging.LogMessageToConsole($"[PassCombatMessageHook] Exception in DuplicateMessage");
+      throw;
+      
+    }
+
+    
   }
 }
