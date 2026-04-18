@@ -29,10 +29,12 @@ public class PlayerNetworkStartHook
     if (__instance.NetworkId.Value == EntityPlayerGameObject.LocalPlayerId.Value)
     {
       MetricsPlayer.PlayerGameObject = __instance;
+      MetricsPlayer.ResetPets();
       MetricsExperience.ResetExperience(__instance.Experience.Total);//TODO does this reset when switching zones?
       MetricsPlayer.IsPlayerLoadedIntoScene = true;
-      ExperienceGUI.InitializeRenderObjects();
-
+      //ExperienceGUI.InitializeRenderObjects();
+      GuiLeftBar.InitializeRenderObjects();
+      MetricsCombat.ResetDpsMeter();
 
       MetricsLogging.LogMessageToConsole($"Loading in as [{MetricsPlayer.PlayerName}({MetricsPlayer.PlayerNetworkId})]. Health: {MetricsPlayer.CurrentHealth}/{MetricsPlayer.MaxHealth}");
       exitMessageReceieved = false;

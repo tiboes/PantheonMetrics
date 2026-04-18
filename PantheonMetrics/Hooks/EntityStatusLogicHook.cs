@@ -46,6 +46,8 @@ public static class EntityStatusLogicHook
       if (!allowedStatusTypes.Contains(statusType))
         return;
 
+      
+
       //MetricsLogging.LogMessageToConsole($"EntityStatusLogicHook {statusType}-{enabled}");
 
       string displayName, classString, entityKind, race, nameText, subNameText, petOwnerIfAny, netId;
@@ -55,12 +57,42 @@ public static class EntityStatusLogicHook
 
       var entityObject = CreateEntityObject(__instance.Entity, (statusType, enabled));
 
+
+      if (statusType == EntityStatusType.Pet)
+      {
+        //MetricsLogging.LogMessageToConsole($"[EntityStatusLogicHook.PreFix] {entityObject.DisplayName}({entityObject.NetworkId}) - {entityObject.Class} - {entityObject.Relation} -  StatusType: {statusType}({enabled})");
+      }
+      if (entityObject.Relation == EntityRelationEnum.Pet && entityObject.OwnerName ==  MetricsPlayer.PlayerName)
+      {
+        //MetricsLogging.LogMessageToConsole($"[SetOverride_Prefix] {entityObject.DisplayName}({entityObject.NetworkId}) - {entityObject.Class} -  statusType: {statusType}({enabled})");
+        MetricsPlayer.AddPet(entityObject);
+
+      }
+      //TODO what messages are received when pets time expires
+
+      //TODO 
+
+
+
       //its probably okay to do above before the player is loaded in. At some point it might be used to populate stuff
       if (!MetricsPlayer.IsPlayerLoadedIntoScene)
         return;
 
       if (statusType == EntityStatusType.Dead && enabled)
         MetricsExperience.LastRegisteredDeath = entityObject;
+
+
+      if (statusType == EntityStatusType.InCombat && enabled && entityObject.IsPlayer())
+      { 
+        MetricsCombat.CombatStartTime = DateTime.Now;
+      }
+
+      if (MetricsCombat.CombatStartTime != null && statusType == EntityStatusType.InCombat && !enabled && entityObject.IsPlayer())
+      {
+        MetricsCombat.CombatEndTime = DateTime.Now;
+      }
+
+      
 
       //MetricsLogging.LogMessageToConsole($"[EntityStatusLogicHook.PreFix] {entityObject.DisplayName}({entityObject.NetworkId}) - {entityObject.Class} - {entityObject.Relation} -  StatusType: {statusType}({enabled})");
     }
@@ -120,9 +152,9 @@ public static class EntityStatusLogicHook
 
 
       if (netId == MetricsPlayer.PlayerNetworkId)
-        entityObject = new EntityObject(netId, displayName, classString, EntityRelationEnum.LocalPlayer);
+        entityObject = new EntityObject(netId, displayName, classString, EntityRelationEnum.LocalPlayer,String.Empty);
       else
-        entityObject = new EntityObject(netId, displayName, classString, EntityRelationEnum.NonLocalPlayer);
+        entityObject = new EntityObject(netId, displayName, classString, EntityRelationEnum.NonLocalPlayer, String.Empty);
 
 
 
@@ -145,7 +177,7 @@ public static class EntityStatusLogicHook
       string owner = String.Empty;
       if (subNameText.EndsWith("Companion>"))//Shaman, Summoner
         owner = subNameText.Substring(1, subNameText.Length - 14);
-      if (subNameText.EndsWith("'s Minion>"))//Necro
+      if (subNameText.EndsWith("'s Minion>"))//Necro, Enchanter
         owner = subNameText.Substring(1, subNameText.Length - 11);
       if (subNameText.EndsWith("'s Ward>"))//Druid
         owner = subNameText.Substring(1, subNameText.Length - 9);
@@ -155,20 +187,26 @@ public static class EntityStatusLogicHook
       {
         var petOwner = MetricsGroup.GetGroupMember(owner);
         if (petOwner != null)
+        { 
           petOwnerIfAny = petOwner.DisplayName;
+          entityRelation = EntityRelationEnum.Pet;
+        }
       }
       else
       {
         if (MetricsPlayer.IsPlayerLoadedIntoScene && MetricsPlayer.PlayerName == owner)//Because this can be called before the Player is loaded into the scene, player object can be null.
+        {
           petOwnerIfAny = MetricsPlayer.PlayerName;
+          entityRelation = EntityRelationEnum.Pet;
+        }
       }
 
 
       //TODO does not handle players outside of group
 
-      entityObject = new EntityObject(netId, displayName, classString, entityRelation);
+      entityObject = new EntityObject(netId, displayName, classString, entityRelation, owner);
       //TODO any situations left?
-
+      
 
     }
 

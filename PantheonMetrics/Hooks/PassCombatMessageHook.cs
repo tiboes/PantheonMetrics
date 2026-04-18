@@ -28,29 +28,45 @@ public class PassCombatMessageHook
   {
     //NOTE THAT When someone (or a pet) dies there can be a message where the attacker is null
     //Since im not using any of this code right now it is disabled
-    return;
+    //we can probably bypass this by having a static attacker/defender variable being set in CreateCombatMessage, and checking thisone against it
 
     if (attacker == null)
     {
-      MetricsLogging.LogMessageToConsole($"[PassCombatMessageHook] Attacker is null, name: {name}, message: {message}");
+      MetricsLogging.LogMessageToConsole($"[PassCombatMessageHook] Attacker is null, message: {message}, defender: {defender==null}");
     }
+    else
+    {
+     // MetricsCombat.LatestAttacker = attacker;
+    }
+
+
+
     if (defender == null)
     {
-      MetricsLogging.LogMessageToConsole($"[PassCombatMessageHook] defender is null, name: {name}, message: {message}");
+      MetricsLogging.LogMessageToConsole($"[PassCombatMessageHook] defender is null, message: {message}, attacker: {attacker == null}");
+    }
+    else
+    {
+      //MetricsCombat.LatestDefender = defender;
     }
 
 
-    var attackerNetworkId = attacker.NetworkId;
-    var defenderNetworkId = defender.NetworkId;
+    var attackerNetworkId = attacker?.NetworkId;
+    var defenderNetworkId = defender?.NetworkId;
 
     //Avoid duplicate messages
     if (IsDuplicateMessage(message, attackerNetworkId, defenderNetworkId))
       return;
 
+    if (isDamage)
+    {
+      MetricsLogging.LogMessageToConsole($"[PassCombatMessageHook] ATK: {attacker?.Info.DisplayName}, DEF: {defender?.Info.DisplayName}, isDMG: {isDamage}, channel: {channel}, direction: {direction}, filter: {filter}, playerFilter: {playerFilter}, message: {message}");
+    }
     
 
-    var attackerDisplayName = attacker.Info?.DisplayName;
-    var defenderDisplayName = defender.Info?.DisplayName;
+
+    var attackerDisplayName = attacker?.Info.DisplayName;
+    var defenderDisplayName = defender?.Info.DisplayName;
 
 
     //MetricsLogging.LogMessageToConsole($"[PassCombatMessage] - {attackerDisplayName} -> {defenderDisplayName} ({attackerNetworkId} -> {defenderNetworkId}) - {isDamage}|{direction}|{filter}|{playerFilter}");
@@ -63,7 +79,7 @@ public class PassCombatMessageHook
 
   }
 
-  private static bool IsDuplicateMessage(string message, Il2CppViNL.NetworkId attackerNetworkId, Il2CppViNL.NetworkId defenderNetworkId)
+  private static bool IsDuplicateMessage(string message, Il2CppViNL.NetworkId? attackerNetworkId, Il2CppViNL.NetworkId? defenderNetworkId)
   {
     try
     {
@@ -72,7 +88,7 @@ public class PassCombatMessageHook
         _lastMessageTime = currentMessageTime;
 
       var timeSinceLastMessage = currentMessageTime - _lastMessageTime;
-      var currentMessageHash = $"{attackerNetworkId.Value}-{defenderNetworkId.Value}-{message}".GetHashCode();
+      var currentMessageHash = $"{attackerNetworkId?.Value}-{defenderNetworkId?.Value}-{message}".GetHashCode();
 
 
       var result = timeSinceLastMessage != 0 && currentMessageHash == _hashOfLastMessage && timeSinceLastMessage < MaxAllowedTicksBetweenSimilarMessages;

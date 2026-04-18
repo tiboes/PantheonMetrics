@@ -2,6 +2,7 @@
 using Il2Cpp;
 using MelonLoader;
 using PantheonMetrics.Data;
+using PantheonMetrics.Objects;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -36,8 +37,29 @@ public static class MetricsPlayer
   private static float _health =0;
   //public static bool CurrentlySubmerged { get; set; } = false;
 
+  public static Dictionary<string, EntityObject> Pets { get; set; } = new Dictionary<string, EntityObject>();
 
+  public static string ListPlayerPets { get
+    {
+      return String.Join(", ", Pets.Keys);
+    } 
+  }
 
+  public static void ResetPets()
+  {
+    Pets = new Dictionary<string, EntityObject>();
+  }
+
+  public static void AddPet(EntityObject pet)
+  {
+
+    if (!Pets.ContainsKey(pet.DisplayName))
+      Pets.Add(pet.DisplayName, pet);
+  }
+  public static void RemovePet(EntityObject pet)
+  {
+    Pets.Remove(pet.DisplayName);
+  }
 
 
 

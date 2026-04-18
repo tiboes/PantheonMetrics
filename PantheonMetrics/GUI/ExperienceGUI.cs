@@ -4,6 +4,7 @@ using Il2CppPantheonPersist;
 using Il2CppTMPro;
 using MelonLoader;
 using PantheonMetrics.Data;
+using PantheonMetrics.GUI.Objects;
 using PantheonMetrics.Hooks;
 using PantheonMetrics.Logics;
 using PantheonMetrics.Objects;
@@ -20,153 +21,188 @@ namespace PantheonMetrics.GUI;
 
 public static class ExperienceGUI
 {
-  private static UnityEngine.Rect _debugWindowRect = new UnityEngine.Rect(15, 50, 300, 130);
+  //private static UnityEngine.Rect _debugWindowRect = new UnityEngine.Rect(15, 50, 300, 130);
 
-  private static Texture2D backgroundTexture = null;
-  private static GUIStyle buttonStyleActivated = null;
-  private static GUIStyle buttonStyleStopped = null;
-  private static GUIStyle buttonStyleStartted = null;
-  private static GUIStyle buttonStyleResetExperience = null;
-  private static GUIStyle boxStyle = null;
-  private static float x = _debugWindowRect.x;
-  private static float y = _debugWindowRect.y;
-  private static float w = _debugWindowRect.width;
-  private static float titleH = 24f;
-  private static float lineH = 18f;
+  //private static Texture2D backgroundTexture = null;
+  //private static GUIStyle buttonStyleActivated = null;
+  //private static GUIStyle buttonStyleStopped = null;
+  //private static GUIStyle buttonStyleStarted = null;
+  //private static GUIStyle buttonStyleResetExperience = null;
+  //private static GUIStyle boxStyle = null;
+  //private static float x = _debugWindowRect.x;
+  //private static float y = _debugWindowRect.y;
+  //private static float w = _debugWindowRect.width;
+  //private static float titleH = 24f;
+  //private static float lineH = 18f;
 
-
-  private static bool ShowExperiencePanel { get; set; } = true;
-
-  public static void Render(bool enabled)
-  {
-    if (!enabled)
-    {
-      var rectPlayBtn = new UnityEngine.Rect(0, y, _debugWindowRect.x, _debugWindowRect.x);
-      if (UnityEngine.GUI.Button(rectPlayBtn, "v", buttonStyleStopped))
-      {
-        MetricsConfiguration.ExperienceMetricEnabled = true;
-        MetricsLogging.LogMessageToInfoChat($"[Metrics] Experience logging has resumed.");
-      }
-      return;
-    }
-
-    var lastKillCount = MetricsExperience.LastKills.Count;
-
-    var rectPauseBtn = new UnityEngine.Rect(0, y, _debugWindowRect.x, _debugWindowRect.x);
-    var rectPauseResetBtn = new UnityEngine.Rect(0, (y + _debugWindowRect.x), _debugWindowRect.x, _debugWindowRect.x);
-    var rectCloseOpenBtn = new UnityEngine.Rect(0, (y + 2 * _debugWindowRect.x), _debugWindowRect.x, (titleH * 9 - 2 * _debugWindowRect.x));
+  //private static Dictionary<int, bool> activationStates = new Dictionary<int, bool>
+  //{
+  //  { 0, true },
+  //  { 1, true },
+  //  { 2, true },
+  //  { 3, true },
+  //  { 4, true },
+  //  { 5, true },
+  //  { 6, true },
+  //  { 7, true },
+  //  { 8, true },
+  //  { 9, true },
+  //};
 
 
-    var rectHeader = new UnityEngine.Rect(x, y + (1 * titleH), w, titleH);
+  //private static bool ShowExperiencePanel { get; set; } = true;
 
-    var rectExpLastPeriod = new UnityEngine.Rect(x, y + (2 * titleH), w, titleH);
-    var rectExpPerMin = new UnityEngine.Rect(x, y + (3 * titleH), w, titleH);
-    var rectExpHististory = new UnityEngine.Rect(x, y + (4 * titleH), w, titleH * 5);
+  //public static void Render(bool enabled)
+  //{
+  //  if (!enabled)
+  //  {
+  //    var rectPlayBtn = new UnityEngine.Rect(0, y, _debugWindowRect.x, _debugWindowRect.x);
+  //    if (UnityEngine.GUI.Button(rectPlayBtn, "v", buttonStyleStopped))
+  //    {
+  //      MetricsConfiguration.ExperienceMetricEnabled = true;
+  //      MetricsLogging.LogMessageToInfoChat($"[Metrics] Experience logging has resumed.");
+  //    }
+  //    return;
+  //  }
 
-    if (UnityEngine.GUI.Button(rectPauseBtn, "", buttonStyleStartted))
-    {
-      MetricsConfiguration.ExperienceMetricEnabled = false;
-      MetricsLogging.LogMessageToInfoChat($"[Metrics] Experience logging has been suspended.");
-      return;
-    }
+  //  var lastKillCount = MetricsExperience.LastKills.Count;
 
-    if (UnityEngine.GUI.Button(rectPauseResetBtn, "R", buttonStyleResetExperience))
-    {
-      MetricsExperience.ResetExperience();
-      MetricsLogging.LogMessageToInfoChat($"[Metrics] Experience logging has been reset.");
-    }
-
-    var collapsableTxt = GUIUtils.GetGUIText((ShowExperiencePanel ? "<" : ">"), (ShowExperiencePanel ? "Grey" : "Grey"), (int)(lineH - 1), true);
-    if (UnityEngine.GUI.Button(rectCloseOpenBtn, collapsableTxt, buttonStyleActivated))
-    {
-      ShowExperiencePanel = !ShowExperiencePanel;
-    }
-
-    if (ShowExperiencePanel)
-    {
-      UnityEngine.GUI.Box(rectHeader, GUIUtils.GetGUIText($"Pantheon Metrics v{PantheonMetricsMain.ModVersion}", "Red", (int)(lineH - 1), true), boxStyle);
-      UnityEngine.GUI.Box(rectExpLastPeriod, GUIUtils.GetGUIText($" Total 10 min: {MetricsExperience.TotalExperienceTheLast10MinCached.ToString("N0", CultureInfo.CurrentUICulture)}", "White", (int)(lineH - 5), true), boxStyle);
-      UnityEngine.GUI.Box(rectExpPerMin, GUIUtils.GetGUIText($@" Average/min: {MetricsExperience.ExperiencePerMinTheLast10MinCached.ToString("N0", CultureInfo.CurrentUICulture)}", "White", (int)(lineH - 5), true), boxStyle);
-
-      //Experience lines
-      UnityEngine.GUI.Box(rectExpHististory, $"", boxStyle);
-
-      for (int i = 0; i < lastKillCount; i++)
-      {
-        var entry = MetricsExperience.LastKills[lastKillCount - 1 - i];
-        var rectExpEntry = new UnityEngine.Rect(x, rectExpHististory.y + (i * titleH), w, titleH);
-        UnityEngine.GUI.Label(rectExpEntry, GUIUtils.GetGUIText($@"{entry.time: HH:mm:ss}: {entry.enemy}({entry.experience.ToString("N0", CultureInfo.CurrentUICulture)})", "White", (int)(lineH - 5)));
-      }
-    }
-  }
-
-  public static void InitializeRenderObjects()
-  {
-    if (backgroundTexture != null)
-      backgroundTexture.MarkDirty();
-
-    backgroundTexture = MakeTex(2, 2, new Color(0.1f, 0.1f, 0.1f, 0.5f));
-    CreateStyles();
-  }
+  //  var rectPauseBtn = new UnityEngine.Rect(0, y, _debugWindowRect.x, _debugWindowRect.x);
+  //  var rectPauseResetBtn = new UnityEngine.Rect(0, (y + _debugWindowRect.x), _debugWindowRect.x, _debugWindowRect.x);
+  //  var rectCloseOpenBtn = new UnityEngine.Rect(0, (y + 2 * _debugWindowRect.x), _debugWindowRect.x, (titleH * 9 - 2 * _debugWindowRect.x));
 
 
+  //  var rectHeader = new UnityEngine.Rect(x, y + (1 * titleH), w, titleH);
 
-  private static void CreateStyles()
-  {
-    buttonStyleActivated = new GUIStyle();
+  //  var rectExpLastPeriod = new UnityEngine.Rect(x, y + (2 * titleH), w, titleH);
+  //  var rectExpPerMin = new UnityEngine.Rect(x, y + (3 * titleH), w, titleH);
+  //  var rectExpHististory = new UnityEngine.Rect(x, y + (4 * titleH), w, titleH * 5);
 
-    buttonStyleActivated.normal.background = MakeTex(2, 2, new Color(0.1f, 0.1f, 0.1f, 1f));
-    buttonStyleActivated.focused.background = MakeTex(2, 2, new Color(1f, 0f, 0f, 1f));
-    buttonStyleActivated.active.background = MakeTex(2, 2, new Color(0f, 1f, 0f, 1f));
-    buttonStyleActivated.hover.background = MakeTex(2, 2, new Color(0f, 0f, 1f, 1f));
-    buttonStyleActivated.alignment = TextAnchor.MiddleLeft;
+  //  if (UnityEngine.GUI.Button(rectPauseBtn, "", buttonStyleStarted))
+  //  {
+  //    MetricsConfiguration.ExperienceMetricEnabled = false;
+  //    MetricsLogging.LogMessageToInfoChat($"[Metrics] Experience logging has been suspended.");
+  //    return;
+  //  }
 
-    buttonStyleResetExperience = new GUIStyle();
+  //  if (UnityEngine.GUI.Button(rectPauseResetBtn, "R", buttonStyleResetExperience))
+  //  {
+  //    MetricsExperience.ResetExperience();
+  //    MetricsLogging.LogMessageToInfoChat($"[Metrics] Experience logging has been reset.");
+  //  }
 
-    buttonStyleResetExperience.normal.background = MakeTex(2, 2, new Color(0.4f, 0.4f, 0.4f, 0.5f));
-    buttonStyleResetExperience.focused.background = MakeTex(2, 2, new Color(1f, 0f, 0f, 0.5f));
-    buttonStyleResetExperience.active.background = MakeTex(2, 2, new Color(0f, 1f, 0f, 0.5f));
-    buttonStyleResetExperience.hover.background = MakeTex(2, 2, new Color(0f, 0f, 1f, 0.5f));
-    buttonStyleResetExperience.alignment = TextAnchor.MiddleCenter;
-    buttonStyleResetExperience.border = new RectOffset();
+  //  var collapsableTxt = GUIUtils.GetGUIText((ShowExperiencePanel ? "<" : ">"), (ShowExperiencePanel ? "Grey" : "Grey"), (int)(lineH - 1), true);
+  //  if (UnityEngine.GUI.Button(rectCloseOpenBtn, collapsableTxt, buttonStyleActivated))
+  //  {
+  //    ShowExperiencePanel = !ShowExperiencePanel;
+  //  }
 
-    buttonStyleStopped = new GUIStyle();
+  //  if (ShowExperiencePanel)
+  //  {
+  //    var dps = $" - DPS: {MetricsCombat.DamagePerSecond():#.#}";
+  //    UnityEngine.GUI.Box(rectHeader, GUIUtils.GetGUIText($"Metrics {dps}", "Red", (int)(lineH - 1), true), boxStyle);
+  //    UnityEngine.GUI.Box(rectExpLastPeriod, GUIUtils.GetGUIText($" Total 10 min: {MetricsExperience.TotalExperienceTheLast10MinCached.ToString("N0", CultureInfo.CurrentUICulture)}", "White", (int)(lineH - 5), true), boxStyle);
+  //    UnityEngine.GUI.Box(rectExpPerMin, GUIUtils.GetGUIText($@" Average/min: {MetricsExperience.ExperiencePerMinTheLast10MinCached.ToString("N0", CultureInfo.CurrentUICulture)}", "White", (int)(lineH - 5), true), boxStyle);
 
-    buttonStyleStopped.normal.background = MakeTex(2, 2, new Color(1f, 0f, 0f, 0.5f));
-    //buttonStyleStarted.focused.background = MakeTex(2, 2, new Color(1f, 0f, 0f, 0.5f));
-    buttonStyleStopped.active.background = MakeTex(2, 2, new Color(0f, 0f, 1f, 0.5f));
-    buttonStyleStopped.hover.background = MakeTex(2, 2, new Color(0f, 1f, 0f, 0.5f));
-    buttonStyleStopped.alignment = TextAnchor.MiddleCenter;
-    buttonStyleStopped.border = new RectOffset();
+  //    //Experience lines
+  //    UnityEngine.GUI.Box(rectExpHististory, $"", boxStyle);
 
-    buttonStyleStartted = new GUIStyle();
+  //    for (int i = 0; i < lastKillCount; i++)
+  //    {
+  //      var entry = MetricsExperience.LastKills[lastKillCount - 1 - i];
+  //      var rectExpEntry = new UnityEngine.Rect(x, rectExpHististory.y + (i * titleH), w, titleH);
+  //      UnityEngine.GUI.Label(rectExpEntry, GUIUtils.GetGUIText($@"{entry.time: HH:mm:ss}: {entry.enemy}({entry.experience.ToString("N0", CultureInfo.CurrentUICulture)})", "White", (int)(lineH - 5)));
+  //    }
+  //  }
+  //}
 
-    buttonStyleStartted.normal.background = MakeTex(2, 2, new Color(0f, 1f, 0f, 0.5f));
-    //buttonStyleStopped.focused.background = MakeTex(2, 2, new Color(1f, 0f, 0f, 0.5f));
-    buttonStyleStartted.active.background = MakeTex(2, 2, new Color(0f, 0f, 1f, 0.5f));
-    buttonStyleStartted.hover.background = MakeTex(2, 2, new Color(1f, 0f, 0f, 0.5f));
-    buttonStyleStartted.alignment = TextAnchor.MiddleCenter;
-    buttonStyleStartted.border = new RectOffset();
+  //private static GUIStyle GetOnOffGUIStyle(int elementId)
+  //{
+  //  if (activationStates.ContainsKey(elementId))
+  //  {
+  //    if (activationStates[elementId])
+  //      return buttonStyleStarted;
+
+  //    return buttonStyleStopped;
+  //  }
+  //  else
+  //    throw new Exception("Unknown id " + elementId);
+  //}
+
+  //public static int PrintMsg(int buttonId, string str)
+  //{
+  //  MetricsLogging.LogMessageToInfoChat($"Button Pressed: {str}");
+  //  activationStates[buttonId] = !activationStates[buttonId];
+  //  return 0;
+  //}
+
+  //public static void InitializeRenderObjects()
+  //{
+  //  if (backgroundTexture != null)
+  //    backgroundTexture.MarkDirty();
+
+  //  backgroundTexture = MakeTex(2, 2, new Color(0.1f, 0.1f, 0.1f, 0.5f));
+  //  CreateStyles();
+  //}
 
 
 
+  //private static void CreateStyles()
+  //{
+  //  buttonStyleActivated = new GUIStyle();
 
-    boxStyle = new GUIStyle();
-    boxStyle.normal.background = backgroundTexture; //MakeTex(2, 2, new Color(0.1f, 0.1f, 0.1f, 0.5f));
-    boxStyle.margin.left = 2;
-  }
-  private static Texture2D MakeTex(int width, int height, Color col)
-  {
-    Color[] pix = new Color[width * height];
-    for (int i = 0; i < pix.Length; ++i)
-    {
-      pix[i] = col;
-    }
-    Texture2D result = new Texture2D(width, height);
-    result.SetPixels(pix);
-    result.Apply();
-    return result;
-  }
+  //  buttonStyleActivated.normal.background = MakeTex(2, 2, new Color(0.1f, 0.1f, 0.1f, 1f));
+  //  buttonStyleActivated.focused.background = MakeTex(2, 2, new Color(1f, 0f, 0f, 1f));
+  //  buttonStyleActivated.active.background = MakeTex(2, 2, new Color(0f, 1f, 0f, 1f));
+  //  buttonStyleActivated.hover.background = MakeTex(2, 2, new Color(0f, 0f, 1f, 1f));
+  //  buttonStyleActivated.alignment = TextAnchor.MiddleLeft;
+
+  //  buttonStyleResetExperience = new GUIStyle();
+
+  //  buttonStyleResetExperience.normal.background = MakeTex(2, 2, new Color(0.4f, 0.4f, 0.4f, 0.5f));
+  //  buttonStyleResetExperience.focused.background = MakeTex(2, 2, new Color(1f, 0f, 0f, 0.5f));
+  //  buttonStyleResetExperience.active.background = MakeTex(2, 2, new Color(0f, 1f, 0f, 0.5f));
+  //  buttonStyleResetExperience.hover.background = MakeTex(2, 2, new Color(0f, 0f, 1f, 0.5f));
+  //  buttonStyleResetExperience.alignment = TextAnchor.MiddleCenter;
+  //  buttonStyleResetExperience.border = new RectOffset();
+
+  //  buttonStyleStopped = new GUIStyle();
+
+  //  buttonStyleStopped.normal.background = MakeTex(2, 2, new Color(1f, 0f, 0f, 0.5f));
+  //  //buttonStyleStarted.focused.background = MakeTex(2, 2, new Color(1f, 0f, 0f, 0.5f));
+  //  buttonStyleStopped.active.background = MakeTex(2, 2, new Color(0f, 0f, 1f, 0.5f));
+  //  buttonStyleStopped.hover.background = MakeTex(2, 2, new Color(0f, 1f, 0f, 0.5f));
+  //  buttonStyleStopped.alignment = TextAnchor.MiddleCenter;
+  //  buttonStyleStopped.border = new RectOffset();
+
+  //  buttonStyleStarted = new GUIStyle();
+
+  //  buttonStyleStarted.normal.background = MakeTex(2, 2, new Color(0f, 1f, 0f, 0.5f));
+  //  //buttonStyleStopped.focused.background = MakeTex(2, 2, new Color(1f, 0f, 0f, 0.5f));
+  //  buttonStyleStarted.active.background = MakeTex(2, 2, new Color(0f, 0f, 1f, 0.5f));
+  //  buttonStyleStarted.hover.background = MakeTex(2, 2, new Color(1f, 0f, 0f, 0.5f));
+  //  buttonStyleStarted.alignment = TextAnchor.MiddleCenter;
+  //  buttonStyleStarted.border = new RectOffset();
+
+
+
+
+  //  boxStyle = new GUIStyle();
+  //  boxStyle.normal.background = backgroundTexture; //MakeTex(2, 2, new Color(0.1f, 0.1f, 0.1f, 0.5f));
+  //  boxStyle.margin.left = 2;
+  //}
+  //private static Texture2D MakeTex(int width, int height, Color col)
+  //{
+  //  Color[] pix = new Color[width * height];
+  //  for (int i = 0; i < pix.Length; ++i)
+  //  {
+  //    pix[i] = col;
+  //  }
+  //  Texture2D result = new Texture2D(width, height);
+  //  result.SetPixels(pix);
+  //  result.Apply();
+  //  return result;
+  //}
 
 
 }

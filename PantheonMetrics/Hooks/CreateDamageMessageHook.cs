@@ -11,7 +11,7 @@ using Il2CppLogicalGraphNodes;
 namespace PantheonMetrics.Hooks;
 
 //[HarmonyPatch(typeof(UIChatWindows), nameof(UIChatWindows.CreateDamageMessage), typeof(string), typeof(int), typeof(string), typeof(string), typeof(CombatResultType), typeof(DamageType), typeof(CombatLogDirectionalFilter), typeof(CombatLogFilter), typeof(bool), typeof(float))]
-//[HarmonyPatch(typeof(UIChatWindows), nameof(UIChatWindows.CreateDamageMessage))]
+[HarmonyPatch(typeof(UIChatWindows), nameof(UIChatWindows.CreateDamageMessage))]
 public  class CreateDamageMessageHook
 {
 
@@ -45,9 +45,25 @@ public  class CreateDamageMessageHook
       //MetricsLogging.LogMessageToConsole($"Breath: {MetricsPlayer.CurrentBreath}");
       //UIChatWindows.Instance.PassMessage(message, ChatChannelType.Info);
     }
-    
-    if (attackerName == MetricsPlayer.PlayerName)
+
+    if ( attackerName == MetricsPlayer.PlayerName || MetricsPlayer.Pets.ContainsKey(attackerName) )
+      MetricsCombat.AddDamageInstance(DateTime.Now, attackerName, defenderName,damage, mitigatedDamage, abilityOrBuffName, damageType.AsString(), combatResultType.ToString());
+
+/***
+    if (MetricsPlayer.Pets.ContainsKey(attackerName))
     {
+      MetricsLogging.LogMessageToConsole($"[CreateDamageMessageHook] Pet Attack: A: {attackerName}, D: {defenderName}, DMG: {damage}, Mit DMG: {mitigatedDamage}, ability: {abilityOrBuffName}, combat result: {combatResultType}, DMG type: {damageType}, direction: {direction}, filter: {filter}, ignoreAttackerName: {ignoreAttackerName}");
+    }
+    else if (attackerName == MetricsPlayer.PlayerName)
+    {
+      MetricsLogging.LogMessageToConsole($"[CreateDamageMessageHook] Player Attack: A: {attackerName}, D: {defenderName}, DMG: {damage}, Mit DMG: {mitigatedDamage}, ability: {abilityOrBuffName}, combat result: {combatResultType}, DMG type: {damageType}, direction: {direction}, filter: {filter}, ignoreAttackerName: {ignoreAttackerName}");
+    }
+    else
+    {
+      //Could be group, non group player/pet or monster
+      //MetricsLogging.LogMessageToConsole($"[CreateDamageMessageHook] Not Player Attack: A: {attackerName}, D: {defenderName}, DMG: {damage}, Mit DMG: {mitigatedDamage}, ability: {abilityOrBuffName}, combat result: {combatResultType}, DMG type: {damageType}, direction: {direction}, filter: {filter}, ignoreAttackerName: {ignoreAttackerName}");
+    }
+*/
       //MetricsBookKeeper.AccumulatedDamage += damage;
       //MetricsBookKeeper.AccumulatedMitigatedDamage += mitigatedDamage;
 
@@ -99,8 +115,8 @@ public  class CreateDamageMessageHook
       //  {
       //    MetricsLogging.LogMessageToConsole($"  Group.Logic group = MetricsPlayer.PlayerGameObject.Group; is null");
       //  }
-        
-        
+
+
       //}
       //catch (Exception ex) 
       //{ 
@@ -108,12 +124,12 @@ public  class CreateDamageMessageHook
       //}
 
 
-       
 
 
 
 
 
-    }
+
+    //}
   }
 }
