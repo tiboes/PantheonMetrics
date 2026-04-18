@@ -70,7 +70,7 @@ public static class MetricsExperience
     ExperiencePerMinTheLast10MinCached = GetExperiencePerMin10MinSliding();
 
     LastKills.Add((DateTime.Now, experienceSource.DisplayName, lastRegisteredExperience));
-    if (LastKills.Count > 5)
+    if (LastKills.Count > 10)
       LastKills.RemoveAt(0);//Make sure its only the last 5 entries in this list
 
   }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PantheonMetrics.GUI.Objects;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,6 +14,15 @@ public static class GUIUtils
   {
     return $"  {GetBoldStartTag(isBold)}<color={color}><size={textSize}>{message}</size></color>{GetBoldEndTag(isBold)}";
   }
+  public static string Text(TextDefinition textDef)
+  {
+    return $"  {GetBoldStartTag(textDef.Bold)}<color={textDef.Color}><size={textDef.Size}>{textDef.Text}</size></color>{GetBoldEndTag(textDef.Bold)}";
+  }
+  public static string TextT(TextDefinition textDef)
+  {
+    return $"  <color={textDef.Color}>{textDef.Text}</color>";
+  }
+
 
 
   public static string GetBoldStartTag(bool isBold) => isBold ? "<b>" : "";

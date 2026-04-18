@@ -62,6 +62,21 @@ public class PantheonMetricsMain : MelonMod
       _lastAliveCheck = now;
       //MetricsLogging.LogMessageToConsole($"Mod Alive Check. Player in scene: {MetricsPlayer.IsPlayerLoadedIntoScene}, GameplayerObject is null - {MetricsPlayer.PlayerGameObject == null} - { MetricsPlayer.PlayerGameObject?.NetworkId.ToString()}");
     }
+
+    if (MetricsCombat.CombatEndTime != null && MetricsCombat.CombatStartTime != null) 
+    {
+      if (MetricsCombat.CombatEndTime.Value.AddMilliseconds(100) > now)
+      {
+
+        //MetricsLogging.LogMessageToInfoChat($"Combat has ended. Duration {MetricsCombat.GetEncounterDuration()} - DPS: {MetricsCombat.GetEncounterDps()}");
+        MetricsLogging.LogMessageToInfoChat(MetricsCombat.GetEncounterResult().Outstring);
+        
+        MetricsCombat.ResetEncounter();
+      }
+
+    }
+
+
   }
 
   
@@ -72,8 +87,12 @@ public class PantheonMetricsMain : MelonMod
 
     if (!MetricsPlayer.IsPlayerLoadedIntoScene)
       return;
-    
-    ExperienceGUI.Render(MetricsConfiguration.ExperienceMetricEnabled);
+
+    //ExperienceGUI.Render(MetricsConfiguration.ExperienceMetricEnabled);
+
+    GuiLeftBar.Render();
+
+
   }
 
 

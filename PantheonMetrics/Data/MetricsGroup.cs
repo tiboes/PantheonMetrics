@@ -39,7 +39,7 @@ public static class MetricsGroup
 
       if (item.EntityNetworkId.Value.ToString() == MetricsPlayer.PlayerNetworkId)
         relation = EntityRelationEnum.LocalPlayer;
-      _group.AddGroupMember(new EntityObject(item.EntityNetworkId.Value.ToString(), item.Name, item.Class.ToString(), relation));
+      _group.AddGroupMember(new EntityObject(item.EntityNetworkId.Value.ToString(), item.Name, item.Class.ToString(), relation,String.Empty));
     }   
     return _group;
   }
