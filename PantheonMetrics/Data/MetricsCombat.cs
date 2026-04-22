@@ -28,19 +28,19 @@ public static class MetricsCombat
   public static bool ShowEncounterInChat { get; set; } = true;
 
 
-  public static void AddDamageInstance(DateTime time, string attackerName, string defenderName, int damage, float mitigatedDamage, string damageAbility, string damageType, string result)
+  public static void AddDamageInstance(DateTime time, string attackerName, string defenderName, int damage, float mitigatedDamage, string damageAbility, string damageType, string result, string direction)
   {
     if (result == "Miss" || result == "Resist")
       return;
-    if (result != "Hit" || result != "Hit, Crit")
-      MetricsLogging.LogMessageToConsole($"{damage} - {mitigatedDamage} - {damageAbility} - {damageType} - {result}");
+    //if (result != "Hit" || result != "Hit, Crit")
+    //  MetricsLogging.LogMessageToConsole($"{damage} - {mitigatedDamage} - {damageAbility} - {damageType} - {result}");
 
     DateTime timecap = DateTime.Now.AddSeconds(-maxRecordKeepingTimeInSeconds);
     int removedDamageInstances = DamageInstancesDPS.RemoveAll(d => d.Time < timecap);
 
     var instance = new DamageInstanceObject(time, attackerName, defenderName, damage, mitigatedDamage, damageAbility, damageType, result);
-    DamageInstancesDPS.Add(instance);
 
+    DamageInstancesDPS.Add(instance);
     EncounterDamageInstances.Add(instance);
   }
 
@@ -122,7 +122,6 @@ public static class MetricsCombat
 
   public static double DamagePerSecond()
   {
-
     //maxRecordKeepingTimeInSeconds
     var instances = DamageInstancesDPS.Where(d => d.Time >= DateTime.Now.AddSeconds(-maxRecordKeepingTimeInSeconds)).ToList();
     if (!instances.Any())
@@ -150,6 +149,9 @@ public static class MetricsCombat
 
 
     var seconds = GetEncounterDurationInSeconds();
+    if (seconds < 1)
+      seconds = 1;
+
     var totalDamageDealt = EncounterDamageInstances.Sum(e=> e.Damage);
     var totalMitigationDealt = EncounterDamageInstances.Sum(e => e.MitigatedDamage);
 

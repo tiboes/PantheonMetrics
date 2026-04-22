@@ -1,5 +1,6 @@
 using HarmonyLib;
 using Il2Cpp;
+using Il2CppViNL;
 using MelonLoader;
 using PantheonMetrics.Data;
 using PantheonMetrics.GUI;
@@ -17,7 +18,6 @@ public class PlayerNetworkStartHook
     // Fired in character select
     //if (__instance.NetworkId.Value == 1)
     //  return;
-
   }
 
   private static void Postfix(EntityPlayerGameObject __instance)
@@ -47,6 +47,9 @@ public class PlayerNetworkStopHook
 {
   private static void Postfix(EntityPlayerGameObject __instance)
   {
+
+    
+
     // Fired in character select
     if (__instance == null || __instance.NetworkId.Value == 1)
       return;

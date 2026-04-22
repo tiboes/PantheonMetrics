@@ -32,6 +32,7 @@ public static class GuiLeftBar
   private static PanelM _encounterTogglePanel;
 
   private static GuiExperience _experience;
+  private static GuiMisc _misc;
   private static GuiDPS _dps; 
   private static GuiEncounterConfig _encounterConfig;
 
@@ -55,6 +56,7 @@ public static class GuiLeftBar
   public static void InitializeRenderObjects()
   {
     GUIGlobals.CreateOrReloadStyles();
+    ResetStyles();
     //mabye mark something as dirty
   }
 
@@ -91,6 +93,11 @@ public static class GuiLeftBar
         if (_toggleState == ToggleBarStatesEnum.EXP)
         {
           _experience.Render();
+        }
+
+        if (_toggleState == ToggleBarStatesEnum.MISC)
+        {
+          _misc.Render();
         }
 
       }
@@ -136,6 +143,11 @@ public static class GuiLeftBar
       _experience = new GuiExperience(_onOffButton.GetLeftOf().x, _onOffButton.GetLeftOf().y, PanelWidth, (_onOffButton.Height + _resetButton.Height + _toggleBarButton.Height));
       _experience.EnsureInitialialization();
     }
+    if (_misc == null)
+    { 
+      _misc = new GuiMisc(_onOffButton.GetLeftOf().x, _onOffButton.GetLeftOf().y, PanelWidth, (_onOffButton.Height + _resetButton.Height + _toggleBarButton.Height)); 
+      _misc.EnsureInitialialization();
+    }
     if (_dps == null)
     {
       _dps= new GuiDPS(_onOffButton.GetLeftOf().x, _onOffButton.GetLeftOf().y, PanelWidth, (_onOffButton.Height + _resetButton.Height + _toggleBarButton.Height));
@@ -146,8 +158,16 @@ public static class GuiLeftBar
       _encounterConfig = new GuiEncounterConfig(_onOffButton.GetLeftOf().x, _onOffButton.GetLeftOf().y, PanelWidth, (_onOffButton.Height + _resetButton.Height + _toggleBarButton.Height));
       _encounterConfig.EnsureInitialialization();
     }
-    
+
   }
+  public static void ResetStyles()
+  {
+    _onOffButton.SetGUIStyle(GUIGlobals.GetButtonStyle(ButtonStyleEnum.Started));
+    _resetButton.SetGUIStyle(GUIGlobals.GetButtonStyle(ButtonStyleEnum.Reset));
+    _toggleBarButton.SetGUIStyle(GUIGlobals.GetButtonStyle(ButtonStyleEnum.Activated));
+  }
+
+
 
   public static int ToggleBar(int id, string value)
   {
@@ -163,6 +183,9 @@ public static class GuiLeftBar
         _toggleState = ToggleBarStatesEnum.EXP;
         break;
       case ToggleBarStatesEnum.EXP:
+        _toggleState = ToggleBarStatesEnum.MISC;
+        break;
+      case ToggleBarStatesEnum.MISC:
         _toggleState = ToggleBarStatesEnum.Hide;
         break;
     }
@@ -207,4 +230,5 @@ public enum ToggleBarStatesEnum
   DPS = 1,
   Encounter = 2,
   EXP = 3,
+  MISC = 4,
 }

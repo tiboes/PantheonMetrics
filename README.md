@@ -5,7 +5,10 @@ This project is a mod for Pantheon: Rise of the Fallen.
 
 Development on this mod is ongoing, so expect changes to functionality and how it visually presents itself in game.
 
-This mod adds an experience counter that shows exp earned in the last 10 minutes, the average exp per minute during the last 10 minutes, as well as the last 5 kills.
+This mod adds the following:
+* An experience counter that shows exp earned in the last 10 minutes, the average exp per minute during the last 10 minutes, as well as showing the last 10 kills.
+* A DPS counter that shows the DPS averaged over the last 10 seconds.
+* Combat encounter stats showing a breakdown of the last fight. Details can be configurd.
 
 
 ## Installation

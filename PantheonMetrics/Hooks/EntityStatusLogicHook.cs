@@ -5,6 +5,7 @@ using Il2CppPantheonPersist;
 using Il2CppSystem.Runtime.Serialization;
 using MelonLoader;
 using PantheonMetrics.Data;
+using PantheonMetrics.GUI;
 using PantheonMetrics.Logics;
 using PantheonMetrics.Objects;
 using System.Reflection;
@@ -23,14 +24,12 @@ public static class EntityStatusLogicHook
       if (__instance == null)
         return;
 
-
       if (PlayerNetworkStartHook.exitMessageReceieved)
       {
         MetricsLogging.LogMessageToConsole($"Incorrect Logging Message Received...Ignoring");
         PlayerNetworkStartHook.exitMessageReceieved = false;
         MetricsPlayer.IsPlayerLoadedIntoScene = true;
       }
-
 
 
       WaterManagement.HandleWaterLogic(statusType, enabled);
@@ -91,8 +90,16 @@ public static class EntityStatusLogicHook
       {
         MetricsCombat.CombatEndTime = DateTime.Now;
       }
+      if (statusType == EntityStatusType.Dead && enabled && entityObject.IsPlayer())
+      {
+        //player has died
+        var x = __instance.Entity.Position.x;
+        var y = __instance.Entity.Position.y;
+        var z = __instance.Entity.Position.z;
+        MetricsDeathKeeper.LastKnowDeathPosition = new EntityPosition(x, y, z);
+        MetricsLogging.LogMessageToInfoChat($"You have died at coordinates: {x}, {y}, {z}");
+      }
 
-      
 
       //MetricsLogging.LogMessageToConsole($"[EntityStatusLogicHook.PreFix] {entityObject.DisplayName}({entityObject.NetworkId}) - {entityObject.Class} - {entityObject.Relation} -  StatusType: {statusType}({enabled})");
     }
