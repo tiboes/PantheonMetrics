@@ -10,42 +10,32 @@ using UnityEngine;
 
 namespace PantheonMetrics.GUI;
 
-public class GuiDPS
+public class GuiDPS : GuiTogglePanelBase
 {
-  private PanelM _dpsTogglePanel;
-  private int _x;
-  private int _y;
-  private int _width;
-  private int _height;
 
+  public GuiDPS(int x, int y, int width, int height) : base(x, y, width, height)
+  {
 
-  public GuiDPS(int x, int y, int width, int height) 
-  { 
-    _x = x;
-    _y = y;
-    _width = width;
-    _height = height;
-    _dpsTogglePanel = new PanelM(0, _x, _y, _width, _height, GUIGlobals.GetButtonStyle(ButtonStyleEnum.Box), "dps");
   }
 
   public void EnsureInitialialization()
   {
-    if (_dpsTogglePanel == null)
-      _dpsTogglePanel = new PanelM(0, _x, _y, _width, _height, GUIGlobals.GetButtonStyle(ButtonStyleEnum.Box), "dps");
+    if (_toggleTogglePanel == null)
+      _toggleTogglePanel = new PanelM(0, _x, _y, _width, _height, GUIGlobals.GetButtonStyle(ButtonStyleEnum.Box), "dps");
   }
 
-  public void Render()
+  public override void Render()
   {
-    _dpsTogglePanel.ResetTextDefinitions();
-    _dpsTogglePanel.SetGUIStyle(GUIGlobals.GetPanelStyle(PanelStyleEnum.Box));
-    _dpsTogglePanel.AddText(new TextDefinition("Damage per second", "Red", 20, true));
+    _toggleTogglePanel.ResetTextDefinitions();
+    _toggleTogglePanel.SetGUIStyle(GUIGlobals.GetPanelStyle(PanelStyleEnum.Box));
+    _toggleTogglePanel.AddText(new TextDefinition("Damage per second", "Red", 20, true));
 
     var dps = MetricsCombat.DamagePerSecond();
     
 
     var dpsTxt = $"{(dps == 0 ? 0 : dps):#}";
 
-    LabelM dpsLbl = new LabelM(1, _dpsTogglePanel.X, (_dpsTogglePanel.Y + 25), _dpsTogglePanel.Width, _dpsTogglePanel.Height-20, null, new TextDefinition(dpsTxt, "Red", 75, true, UnityEngine.TextAnchor.LowerRight));
+    LabelM dpsLbl = new LabelM(1, _toggleTogglePanel.X, (_toggleTogglePanel.Y + 25), _toggleTogglePanel.Width, _toggleTogglePanel.Height-20, null, new TextDefinition(dpsTxt, "Red", 75, true, UnityEngine.TextAnchor.LowerRight));
 
 
 
@@ -65,7 +55,7 @@ public class GuiDPS
     //  _experienceTogglePanel.AddText(new TextDefinition(killLine, "White", 16));
     //}
 
-    _dpsTogglePanel.Render();
+    _toggleTogglePanel.Render();
     dpsLbl.Render();
     //totalLbl.Render();
     //avgLbl.Render();

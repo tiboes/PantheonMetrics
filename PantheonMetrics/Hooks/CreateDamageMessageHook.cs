@@ -46,8 +46,12 @@ public  class CreateDamageMessageHook
       //UIChatWindows.Instance.PassMessage(message, ChatChannelType.Info);
     }
 
-    if ( attackerName == MetricsPlayer.PlayerName || MetricsPlayer.Pets.ContainsKey(attackerName) )
-      MetricsCombat.AddDamageInstance(DateTime.Now, attackerName, defenderName,damage, mitigatedDamage, abilityOrBuffName, damageType.AsString(), combatResultType.ToString());
+    if ((attackerName == MetricsPlayer.PlayerName  || MetricsPlayer.Pets.ContainsKey(attackerName)) && attackerName != defenderName && defenderName != MetricsPlayer.PlayerName && !MetricsPlayer.Pets.ContainsKey(defenderName))
+    {
+
+      //MetricsLogging.LogMessageToConsole($"[CreateDamageMessage] - {attackerName} -> {defenderName}: Damage: {damage}, Mitigated: {mitigatedDamage} - {combatResultType}|{direction}|{filter}|{ignoreAttackerName}");
+      MetricsCombat.AddDamageInstance(DateTime.Now, attackerName, defenderName, damage, mitigatedDamage, abilityOrBuffName, damageType.AsString(), combatResultType.ToString(), direction.ToString());
+    }
 
 /***
     if (MetricsPlayer.Pets.ContainsKey(attackerName))
