@@ -1,6 +1,9 @@
 ﻿using HarmonyLib;
 using Il2Cpp;
+using Il2CppInterop.Generator.MetadataAccess;
+using Il2CppInterop.Runtime;
 using Il2CppPantheonPersist;
+using Il2CppSystem.Runtime.Serialization;
 using Il2CppTMPro;
 using MelonLoader;
 using PantheonMetrics.Data;
@@ -13,9 +16,18 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using Unity.Collections;
+using Unity.Scenes;
 using UnityEngine;
+using UnityEngine;
+using UnityEngine.Playables;
+using UnityEngine.SceneManagement;
 using UnityEngine.TextCore.Text;
+using UnityEngine.UI;
+//using TMPro;
+using UnityEngine.UI;
 using static Il2CppSystem.Xml.XmlTextReaderImpl;
+using static UnityEngine.LowLevelPhysics2D.PhysicsLayers;
+
 
 namespace PantheonMetrics;
 
@@ -24,6 +36,7 @@ public class PantheonMetricsMain : MelonMod
 {
   public const string ModVersion = "1.0.1";
   private DateTime _lastAliveCheck = DateTime.MinValue;
+  private static ModWindow modWindow = new ModWindow();
 
 
   private static PropertyInfo _statusLogicEntityProp;    // EntityStatus.Logic.Entity → IEntity
@@ -31,8 +44,13 @@ public class PantheonMetricsMain : MelonMod
   private static FieldInfo _statusLogicEntityField;
   private static MethodInfo _getNetworkIdMethod;
   private static Assembly _il2cppAsm;
+  private static float width = 500;
+  private static float height = 500;
 
-  
+
+
+  public Canvas parentCanvas;
+  public TMP_InputField inputFieldPrefab;
 
   public override void OnInitializeMelon()
   {
@@ -69,8 +87,10 @@ public class PantheonMetricsMain : MelonMod
       {
 
         //MetricsLogging.LogMessageToInfoChat($"Combat has ended. Duration {MetricsCombat.GetEncounterDuration()} - DPS: {MetricsCombat.GetEncounterDps()}");
-        MetricsLogging.LogMessageToInfoChat(MetricsCombat.GetEncounterResult().Outstring);
-        
+        //MetricsLogging.LogMessageToInfoChat(MetricsCombat.GetEncounterResult().Outstring);
+
+        //Forcing encounter data even if not on encounter tab
+        MetricsCombat.GetEncounterResultAsLines();
         MetricsCombat.ResetEncounter();
       }
 
@@ -79,21 +99,28 @@ public class PantheonMetricsMain : MelonMod
 
   }
 
-  
+  public static void ShowMetrics()
+  {
+    if (MetricsPlayer.IsPlayerLoadedIntoScene)
+    {
+      modWindow.ShowWindow();
+    }
+  }
+
+  public static void CreateTimeDisplay()
+  {
+    // Build the panel and render it
+    modWindow.DisplayPanel("ClockPanel", UIPanelRoots.Instance.Mid.transform, new Vector2(width, height));
+  }
+
   public override void OnGUI()
   {
-    
-
-
     if (!MetricsPlayer.IsPlayerLoadedIntoScene)
       return;
 
-    //ExperienceGUI.Render(MetricsConfiguration.ExperienceMetricEnabled);
+    //GuiLeftBar.Render();
 
-    GuiLeftBar.Render();
-
-
+    ModWindowButtons.Render();
   }
-
 
 }

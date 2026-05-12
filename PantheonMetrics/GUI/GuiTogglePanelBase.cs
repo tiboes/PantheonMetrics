@@ -22,7 +22,7 @@ public abstract class GuiTogglePanelBase
     _y = y;
     _width = width;
     _height = height;
-    _toggleTogglePanel = new PanelM(0, _x, _y, _width, _height, GUIGlobals.GetButtonStyle(ButtonStyleEnum.Box), "Toggle");
+    _toggleTogglePanel = new PanelM(0, _x, _y, _width, _height, GUIGlobals.GetButtonStyle(ButtonStyleEnum.Box), "");
   }
 
   public abstract void Render();

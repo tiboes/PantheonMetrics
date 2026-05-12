@@ -6,5 +6,9 @@ using System.Threading.Tasks;
 
 namespace PantheonMetrics.Objects;
 
-public record EntityPosition(float X, float Y, float Z, int Heading);
+public enum ConsiderRatingEnum
+{
+  None,
+  Trivial,
 
+}

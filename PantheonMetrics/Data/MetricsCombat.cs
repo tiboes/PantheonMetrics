@@ -13,9 +13,12 @@ public static class MetricsCombat
   private static int maxRecordKeepingTimeInSeconds = 10;
   private static IEntity? LatestAttacker { get; set; } = null;
   private static IEntity? LatestDefender { get; set; } = null;
+  private static DateTime LastResetEncounterTime { get; set; } = DateTime.MinValue;
 
   private static List<DamageInstanceObject> DamageInstancesDPS { get; set; } = new List<DamageInstanceObject>();
   private static List<DamageInstanceObject> EncounterDamageInstances { get; set; } = new List<DamageInstanceObject>();
+  private static List<DamageInstanceObject> LastEncounterDamageInstancesSaved { get; set; } = new List<DamageInstanceObject>();
+
 
   public static DateTime? CombatStartTime { get; set; } = null;
   public static DateTime? CombatEndTime { get; set; } = null;
@@ -26,6 +29,8 @@ public static class MetricsCombat
   public static bool ShowMitigatedDamage { get; set; } = false;
 
   public static bool ShowEncounterInChat { get; set; } = true;
+
+  public static List<string> LatestEncounterLinesSaved { get; set; } = new List<string>();
 
 
   public static void AddDamageInstance(DateTime time, string attackerName, string defenderName, int damage, float mitigatedDamage, string damageAbility, string damageType, string result, string direction)
@@ -44,21 +49,21 @@ public static class MetricsCombat
     EncounterDamageInstances.Add(instance);
   }
 
-  public static int GetEncounterDurationInSeconds() => EncounterDamageInstances.Any() ? (int)(EncounterDamageInstances.Last().Time - EncounterDamageInstances.First().Time).TotalSeconds  : 0;
+  public static int GetEncounterDurationInSeconds(List<DamageInstanceObject> instances) => instances.Any() ? (int)(instances.Last().Time - instances.First().Time).TotalSeconds  : 0;
   public static double GetEncounterDpsSimple()
   {
     if(!EncounterDamageInstances.Any())
       return 0;
-    var seconds = GetEncounterDurationInSeconds();
+    var seconds = GetEncounterDurationInSeconds(EncounterDamageInstances);
     var damage = EncounterDamageInstances.Sum(e => e.Damage);
     if (seconds < 1)
       return damage;
     return damage / seconds;
 
   }
-  public static string GetEncounterDuration()
+  public static string GetEncounterDuration(List<DamageInstanceObject> instances)
   {
-    var seconds = GetEncounterDurationInSeconds();
+    var seconds = GetEncounterDurationInSeconds(instances);
     if (seconds < 60)
       return $"00:{seconds:00}";
 
@@ -72,7 +77,7 @@ public static class MetricsCombat
     if (!EncounterDamageInstances.Any())
       return "0";
 
-    var seconds = GetEncounterDurationInSeconds();
+    var seconds = GetEncounterDurationInSeconds(EncounterDamageInstances);
     
     var byAttacker = EncounterDamageInstances.GroupBy(e => e.AttackerName);
     if (byAttacker.Count() == 1)
@@ -112,6 +117,7 @@ public static class MetricsCombat
     CombatStartTime = null;
     CombatEndTime = null;
     EncounterDamageInstances = new List<DamageInstanceObject>();
+    LastResetEncounterTime = DateTime.Now;
     //ResetDpsMeter();
   }
 
@@ -137,6 +143,64 @@ public static class MetricsCombat
     return (instances.Sum(d => d.Damage) / seconds);
   }
 
+
+  public static List<string> GetEncounterResultAsLines()
+  {
+    var encounterDamageInstances = EncounterDamageInstances;
+    if (!EncounterDamageInstances.Any() || LastResetEncounterTime > DateTime.Now.AddSeconds(-1))
+      encounterDamageInstances = LastEncounterDamageInstancesSaved;
+    if (!encounterDamageInstances.Any())
+      return new List<string>();
+
+    List<string> result = new List<string>();
+    var seconds = GetEncounterDurationInSeconds(encounterDamageInstances);
+    if (seconds < 1)
+      seconds = 1;
+
+    var totalDamageDealt = encounterDamageInstances.Sum(e => e.Damage);
+    var totalMitigationDealt = encounterDamageInstances.Sum(e => e.MitigatedDamage);
+
+    var start = encounterDamageInstances.First().Time;
+    var end = encounterDamageInstances.Last().Time;
+
+    result.Add($"Encounter Duration: {start:HH:mm:ss} - {end:HH:mm:ss}  ({GetEncounterDuration(encounterDamageInstances)})");
+    string mitigatedEncounterText = ShowMitigatedDamage ? $"- Mitigation {(totalMitigationDealt):#} " : "";
+    result.Add($"Encounter Damage: {(totalDamageDealt):#} {mitigatedEncounterText}- DPS: {(totalDamageDealt / seconds):#}");
+
+
+
+    int dpsLength = 10;
+    int damageLength = 10;
+    int mitigationLength = 10;
+    int nameLength = encounterDamageInstances.Max(m => m.AttackerName.Length);
+    nameLength = nameLength < 20 ? 20 : nameLength;
+
+    string migitagedSubHeader = ShowMitigatedDamage ? " | Mitigated" : "";
+    int noParticipants = 1;
+
+    if (ShowAttackerBreakdown)
+    {
+      result.Add($"");
+      result.Add($"Breakdown by participant");
+      OutputByString(result, encounterDamageInstances.GroupBy(e => e.AttackerName), totalDamageDealt);
+    }
+
+    if (ShowAbilityBreakdown)
+    {
+      result.Add($"");
+      result.Add($"Breakdown by skill - Damage{migitagedSubHeader}");
+      OutputByString(result, encounterDamageInstances.GroupBy(e => e.DamageAbility), totalDamageDealt);
+    }
+    if (ShowDamageTypeBreakdown)
+    {
+      result.Add($"");
+      result.Add($"Breakdown by DamageType - Damage{migitagedSubHeader}");
+      OutputByString(result, encounterDamageInstances.GroupBy(e => e.DamageType), totalDamageDealt);
+    }
+    LastEncounterDamageInstancesSaved = encounterDamageInstances;
+    return result;
+  }
+    
   public static (string Outstring, int lines) GetEncounterResult() 
   {
     if (!EncounterDamageInstances.Any())
@@ -148,7 +212,7 @@ public static class MetricsCombat
     StringBuilder result = new StringBuilder();
 
 
-    var seconds = GetEncounterDurationInSeconds();
+    var seconds = GetEncounterDurationInSeconds(EncounterDamageInstances);
     if (seconds < 1)
       seconds = 1;
 
@@ -158,7 +222,7 @@ public static class MetricsCombat
     var start = EncounterStart;
     var end = EncounterEnd;
 
-    result.AppendLine($"Encounter Duration: {start:HH:mm:ss} - {end:HH:mm:ss}  ({GetEncounterDuration()})");
+    result.AppendLine($"Encounter Duration: {start:HH:mm:ss} - {end:HH:mm:ss}  ({GetEncounterDuration(EncounterDamageInstances)})");
     string mitigatedEncounterText = ShowMitigatedDamage ? $"- Mitigation {(totalMitigationDealt):#} " : "";
     result.AppendLine($"Encounter Damage: {(totalDamageDealt):#} {mitigatedEncounterText}- DPS: {(totalDamageDealt / seconds):#}");
 
@@ -210,6 +274,22 @@ public static class MetricsCombat
     foreach (var item in percentages.OrderByDescending(x => x.percentage)) 
     {
       result.AppendLine(item.outputString);
+    }
+  }
+  private static void OutputByString(List<string> result, IEnumerable<IGrouping<string, DamageInstanceObject>> grouping, int totalDamage)
+  {
+    List<(decimal percentage, string outputString)> percentages = new List<(decimal percentage, string outputString)>();
+    foreach (var item in grouping)
+    {
+      var damage = item.Sum(i => i.Damage);
+      decimal percentage = (decimal)damage / totalDamage;
+      var outputText = $"({percentage:P1}) - {GetByOutputString(item)}";
+      percentages.Add((percentage, outputText));
+    }
+    ;
+    foreach (var item in percentages.OrderByDescending(x => x.percentage))
+    {
+      result.Add(item.outputString);
     }
   }
 
