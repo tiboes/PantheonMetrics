@@ -22,7 +22,24 @@ public class GUIElmentM
   public int X => _x;
   public int Y => _y;
   public int Width => _width;
-  public int Height => _height;
+  public int Height
+  {
+    get
+    {
+      return _height;
+    }
+    set
+    {
+      _height = value;
+    }
+  }
+
+  public void UpdateXY(int x, int y)
+  {
+    _x = x;
+    _y = y;
+  }
+
   public int ElementId => _elementId; 
   
   public string Text

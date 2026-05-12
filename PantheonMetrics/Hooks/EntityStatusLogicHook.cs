@@ -96,8 +96,9 @@ public static class EntityStatusLogicHook
         var x = __instance.Entity.Position.x;
         var y = __instance.Entity.Position.y;
         var z = __instance.Entity.Position.z;
-        MetricsDeathKeeper.LastKnowDeathPosition = new EntityPosition(x, y, z);
+        MetricsLocation.LastKnowDeathPosition = new EntityPosition(x, y, z,0);
         MetricsLogging.LogMessageToInfoChat($"You have died at coordinates: {x}, {y}, {z}");
+        MetricsLocation.AddLocation((int)__instance.Entity.Position.x, (int)__instance.Entity.Position.z, $"Death time: {DateTime.Now: HH:mm}");
       }
 
 
@@ -132,7 +133,7 @@ public static class EntityStatusLogicHook
       race = entity.Info.Race.ToString();
       entityRace = entity.Info.Race;
 
-
+      
       if (entity.Nameplate != null)
       {
         EntityNameplate nameplate = entity.Nameplate;

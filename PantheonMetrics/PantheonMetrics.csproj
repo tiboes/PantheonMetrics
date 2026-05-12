@@ -4,6 +4,7 @@
         <TargetFramework>net6.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
 
     <ItemGroup>
@@ -547,10 +548,12 @@
     </ItemGroup>
 
     <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-        <ItemGroup>
-            <FilesToCopy Include="$(TargetDir)PantheonMetrics.dll" />
-        </ItemGroup>
+		<ItemGroup>
+			<FilesToCopy Include="$(TargetDir)PantheonMetrics.dll" />
+			<FilesToCopy2 Include=".\Resources\*" />
+		</ItemGroup>
         <Copy SourceFiles="@(FilesToCopy)" DestinationFolder="$(GamePath)/Mods" />
+		<Copy SourceFiles="@(FilesToCopy2)" DestinationFolder="$(GamePath)/Mods/MetricsResources" />
     </Target>
     
 </Project>

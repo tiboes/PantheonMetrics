@@ -1,5 +1,6 @@
 using HarmonyLib;
 using Il2Cpp;
+using Il2CppLogicalGraphNodes;
 using Il2CppViNL;
 using MelonLoader;
 using PantheonMetrics.Data;
@@ -12,7 +13,7 @@ public class PlayerNetworkStartHook
 {
   public static bool exitMessageReceieved { get; set; } = false;
 
-
+  
   private static void Prefix(EntityPlayerGameObject __instance)
   {
     // Fired in character select
@@ -34,6 +35,8 @@ public class PlayerNetworkStartHook
       MetricsPlayer.IsPlayerLoadedIntoScene = true;
       //ExperienceGUI.InitializeRenderObjects();
       GuiLeftBar.InitializeRenderObjects();
+      ModWindowButtons.InitializeRenderObjects();
+
       MetricsCombat.ResetDpsMeter();
 
       MetricsLogging.LogMessageToConsole($"Loading in as [{MetricsPlayer.PlayerName}({MetricsPlayer.PlayerNetworkId})]. Health: {MetricsPlayer.CurrentHealth}/{MetricsPlayer.MaxHealth}");
@@ -47,9 +50,6 @@ public class PlayerNetworkStopHook
 {
   private static void Postfix(EntityPlayerGameObject __instance)
   {
-
-    
-
     // Fired in character select
     if (__instance == null || __instance.NetworkId.Value == 1)
       return;

@@ -23,22 +23,35 @@ public class GuiExperience : GuiTogglePanelBase
     if (_toggleTogglePanel == null)
       _toggleTogglePanel = new PanelM(0, _x, _y, _width, _height, GUIGlobals.GetButtonStyle(ButtonStyleEnum.Box), "Experience");
   }
-
+  public void Render(int x, int y)
+  {
+    _x = x;
+    _y = y;
+    _toggleTogglePanel.UpdateXY(_x, _y);
+    Render();
+  }
   public override void Render()
   {
     _toggleTogglePanel.ResetTextDefinitions();
     _toggleTogglePanel.SetGUIStyle(GUIGlobals.GetPanelStyle(PanelStyleEnum.Box));
-    _toggleTogglePanel.AddText(new TextDefinition("EXPERIENCE", "Red", 20, true));
+    //_toggleTogglePanel.AddText(new TextDefinition("EXPERIENCE", "Red", 20, true));
     _toggleTogglePanel.AddText(new TextDefinition("", "White", 20, true));//Just to make space
     _toggleTogglePanel.AddText(new TextDefinition("", "White", 20, true));//Just to make space
 
     var totalValue = MetricsExperience.TotalExperienceTheLast10MinCached.ToString("N0", CultureInfo.CurrentUICulture);
     var avgValue = MetricsExperience.ExperiencePerMinTheLast10MinCached.ToString("N0", CultureInfo.CurrentUICulture);
     //Line 1 
-    LabelM totalLbl = new LabelM(1, _toggleTogglePanel.X, (_toggleTogglePanel.Y + 25), _toggleTogglePanel.Width / 2, 18, null, new TextDefinition("Total 10 min", "White", 18, false, UnityEngine.TextAnchor.MiddleCenter));
+    //LabelM totalLbl = new LabelM(1, _toggleTogglePanel.X, (_toggleTogglePanel.Y + 25), _toggleTogglePanel.Width / 2, 18, null, new TextDefinition("Total 10 min", "White", 18, false, UnityEngine.TextAnchor.MiddleCenter));
+    //LabelM avgLbl = new LabelM(2, totalLbl.GetLeftOf().x, totalLbl.GetLeftOf().y, totalLbl.Width, totalLbl.Height, null, new TextDefinition("Average/min", "White", 18, false, UnityEngine.TextAnchor.MiddleCenter));
+    //LabelM totalValueLbl = new LabelM(3, totalLbl.GetBelow().x, totalLbl.GetBelow().y + 2, totalLbl.GetWidthHeight().width, totalLbl.GetWidthHeight().height, null, new TextDefinition(totalValue, "White", 18, false, UnityEngine.TextAnchor.MiddleCenter));
+    //LabelM avgValueLbl = new LabelM(3, avgLbl.GetBelow().x, avgLbl.GetBelow().y + 2, avgLbl.GetWidthHeight().width, avgLbl.GetWidthHeight().height, null, new TextDefinition(avgValue, "White", 18, false, UnityEngine.TextAnchor.MiddleCenter));
+
+    LabelM totalLbl = new LabelM(1, _toggleTogglePanel.X, _toggleTogglePanel.Y, _toggleTogglePanel.Width / 2, 18, null, new TextDefinition("Total 10 min", "White", 18, false, UnityEngine.TextAnchor.MiddleCenter));
     LabelM avgLbl = new LabelM(2, totalLbl.GetLeftOf().x, totalLbl.GetLeftOf().y, totalLbl.Width, totalLbl.Height, null, new TextDefinition("Average/min", "White", 18, false, UnityEngine.TextAnchor.MiddleCenter));
     LabelM totalValueLbl = new LabelM(3, totalLbl.GetBelow().x, totalLbl.GetBelow().y + 2, totalLbl.GetWidthHeight().width, totalLbl.GetWidthHeight().height, null, new TextDefinition(totalValue, "White", 18, false, UnityEngine.TextAnchor.MiddleCenter));
     LabelM avgValueLbl = new LabelM(3, avgLbl.GetBelow().x, avgLbl.GetBelow().y + 2, avgLbl.GetWidthHeight().width, avgLbl.GetWidthHeight().height, null, new TextDefinition(avgValue, "White", 18, false, UnityEngine.TextAnchor.MiddleCenter));
+
+
 
     var lastKillCount = MetricsExperience.LastKills.Count;
     for (int i = 0; i < lastKillCount; i++)

@@ -21,21 +21,30 @@ public class GuiDPS : GuiTogglePanelBase
   public void EnsureInitialialization()
   {
     if (_toggleTogglePanel == null)
-      _toggleTogglePanel = new PanelM(0, _x, _y, _width, _height, GUIGlobals.GetButtonStyle(ButtonStyleEnum.Box), "dps");
+      _toggleTogglePanel = new PanelM(0, _x, _y, _width, _height, GUIGlobals.GetPanelStyle(PanelStyleEnum.Invisible), "dps");
+  }
+
+
+  public void Render(int x, int y)
+  {
+    _x = x; 
+    _y = y;
+    _toggleTogglePanel.UpdateXY(_x, _y);
+    Render();
   }
 
   public override void Render()
   {
     _toggleTogglePanel.ResetTextDefinitions();
-    _toggleTogglePanel.SetGUIStyle(GUIGlobals.GetPanelStyle(PanelStyleEnum.Box));
-    _toggleTogglePanel.AddText(new TextDefinition("Damage per second", "Red", 20, true));
+    _toggleTogglePanel.SetGUIStyle(GUIGlobals.GetPanelStyle(PanelStyleEnum.Invisible));
+    _toggleTogglePanel.AddText(new TextDefinition("Damage per second", "Red", 40, true));
 
     var dps = MetricsCombat.DamagePerSecond();
     
 
     var dpsTxt = $"{(dps == 0 ? 0 : dps):#}";
 
-    LabelM dpsLbl = new LabelM(1, _toggleTogglePanel.X, (_toggleTogglePanel.Y + 25), _toggleTogglePanel.Width, _toggleTogglePanel.Height-20, null, new TextDefinition(dpsTxt, "Red", 75, true, UnityEngine.TextAnchor.LowerRight));
+    LabelM dpsLbl = new LabelM(1, _toggleTogglePanel.X, (_toggleTogglePanel.Y + 25), _toggleTogglePanel.Width, _toggleTogglePanel.Height-20, null, new TextDefinition(dpsTxt, "Red", 100, true, UnityEngine.TextAnchor.MiddleCenter));
 
 
 
